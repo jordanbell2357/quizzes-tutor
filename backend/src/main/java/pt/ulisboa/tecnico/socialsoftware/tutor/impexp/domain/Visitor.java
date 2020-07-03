@@ -2,6 +2,8 @@ package pt.ulisboa.tecnico.socialsoftware.tutor.impexp.domain;
 
 import pt.ulisboa.tecnico.socialsoftware.tutor.answer.domain.QuestionAnswer;
 import pt.ulisboa.tecnico.socialsoftware.tutor.answer.domain.QuizAnswer;
+import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.domain.Clarification;
+import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.domain.DiscussionEntry;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.*;
@@ -20,6 +22,8 @@ public interface Visitor {
 
     default void visitQuizQuestion(QuizQuestion quizQuestion) {}
 
+    default void visitDiscussionEntry(DiscussionEntry discussionEntry) {}
+
     default void visitUser(User user) {}
 
     default void visitQuizAnswer(QuizAnswer quizAnswer) {}
@@ -33,6 +37,8 @@ public interface Visitor {
     default void visitAssessment(Assessment assessment) {}
 
     default void visitCourseExecution(CourseExecution courseExecution) {}
+
+    default void visitClarification(Clarification clarification) {}
 
     default String convertSequenceToLetter(Integer value) {
         switch (value) {

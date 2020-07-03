@@ -1,5 +1,7 @@
 package pt.ulisboa.tecnico.socialsoftware.tutor.answer.domain;
 
+import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.domain.Clarification;
+import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.domain.DiscussionEntry;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
 import pt.ulisboa.tecnico.socialsoftware.tutor.impexp.domain.DomainEntity;
 import pt.ulisboa.tecnico.socialsoftware.tutor.impexp.domain.Visitor;
@@ -7,6 +9,9 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Option;
 import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.domain.QuizQuestion;
 
 import javax.persistence.*;
+
+import java.util.HashSet;
+import java.util.Set;
 
 import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.INVALID_SEQUENCE_FOR_QUESTION_ANSWER;
 
@@ -36,6 +41,9 @@ public class QuestionAnswer implements DomainEntity {
     @ManyToOne(fetch=FetchType.EAGER, optional=true)
     @JoinColumn(name = "option_id")
     private Option option;
+
+    @OneToMany(mappedBy = "questionAnswer")
+    private Set<Clarification> clarifications = new HashSet<>();
 
     private Integer sequence;
 
