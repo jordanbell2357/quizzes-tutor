@@ -14,6 +14,10 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.repository.Clarific
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
 import pt.ulisboa.tecnico.socialsoftware.tutor.statement.QuestionAnswerItemRepository;
 import java.sql.SQLException;
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.QUESTION_ANSWER_NOT_FOUND;
 
 @Service
@@ -38,5 +42,13 @@ public class ClarificationService {
         return new ClarificationDto(clarification);
     }
 
+    @Retryable(
+            value = { SQLException.class },
+            backoff = @Backoff(delay = 5000))
+    @Transactional(isolation = Isolation.READ_COMMITTED)
+    public List<ClarificationDto> getClarifications (Integer questionAnswerId) {
+        QuestionAnswer questionAnswer =  questionAnswerRepository.findById(questionAnswerId).orElseThrow(() -> new TutorException(QUESTION_ANSWER_NOT_FOUND, questionAnswerId));
+        return questionAnswer.getClarifications().stream().sorted(Comparator.comparing(Clarification::getTitle)).map(ClarificationDto::new).collect(Collectors.toList());
+    }
 
 }

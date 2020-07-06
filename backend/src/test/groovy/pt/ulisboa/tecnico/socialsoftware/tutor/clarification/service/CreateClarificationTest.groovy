@@ -15,12 +15,6 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Option
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Question
 import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.domain.Quiz
-import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.domain.QuizQuestion
-import pt.ulisboa.tecnico.socialsoftware.tutor.user.User
-
-import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.CLARIFICATION_TITLE_IS_EMPTY
-import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.QUIZ_NO_LONGER_AVAILABLE
-
 @DataJpaTest
 class CreateClarificationTest extends SpockTest {
     def questionAnswer
@@ -79,7 +73,7 @@ class CreateClarificationTest extends SpockTest {
 
     }
 
-    def 'new clarification with empty title'() {
+    def 'new clarification with no title'() {
         given: 'A questionAnswerId'
         def questionAnswer = questionAnswerRepository.findAll().get(0)
         def questionAnswerId = questionAnswer.getId()
@@ -93,9 +87,31 @@ class CreateClarificationTest extends SpockTest {
         then:
         TutorException exception = thrown()
         exception.getErrorMessage() == CLARIFICATION_TITLE_IS_EMPTY
+    }
 
+    def 'new clarification with empty title'() {
+        given: 'A questionAnswerId'
+        def questionAnswer = questionAnswerRepository.findAll().get(0)
+        def questionAnswerId = questionAnswer.getId()
+        and: 'A ClarificationDto with no title'
+        def clarificationDto = new ClarificationDto()
+        clarificationDto.setTitle('')
+        clarificationDto.setQuestionAnswerId(questionAnswerId)
+
+        when:
+        clarificationService.createClarification(questionAnswerId, clarificationDto)
+
+        then:
+        TutorException exception = thrown()
+        exception.getErrorMessage() == CLARIFICATION_TITLE_IS_EMPTY
     }
 
     @TestConfiguration
     static class LocalBeanConfiguration extends BeanConfiguration {}
 }
+import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.domain.QuizQuestion
+
+import pt.ulisboa.tecnico.socialsoftware.tutor.user.User
+import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.CLARIFICATION_TITLE_IS_EMPTY
+
+import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.QUIZ_NO_LONGER_AVAILABLE
