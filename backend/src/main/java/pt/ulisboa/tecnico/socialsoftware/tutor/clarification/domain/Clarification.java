@@ -1,12 +1,16 @@
 package pt.ulisboa.tecnico.socialsoftware.tutor.clarification.domain;
 
 import pt.ulisboa.tecnico.socialsoftware.tutor.answer.domain.QuestionAnswer;
+import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.dto.ClarificationDto;
+import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage;
+import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
 import pt.ulisboa.tecnico.socialsoftware.tutor.impexp.domain.DomainEntity;
 import pt.ulisboa.tecnico.socialsoftware.tutor.impexp.domain.Visitor;
 import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.domain.QuizQuestion;
 
 import javax.persistence.*;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
@@ -30,6 +34,15 @@ public class Clarification implements DomainEntity {
 
     public Clarification(String title) {
         this.title = title;
+    }
+
+    public Clarification(ClarificationDto clarificationDto, QuestionAnswer questionAnswer) {
+        this.questionAnswer = questionAnswer;
+        if (clarificationDto.getTitle() != null) {
+            if (!clarificationDto.getTitle().isEmpty())
+                this.title = clarificationDto.getTitle();
+        }
+        else throw new TutorException(ErrorMessage.CLARIFICATION_TITLE_IS_EMPTY);
     }
 
     @Override

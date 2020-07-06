@@ -121,6 +121,15 @@ public class QuestionAnswer implements DomainEntity {
         this.sequence = sequence;
     }
 
+
+    public Set<Clarification> getClarifications() {
+        return clarifications;
+    }
+
+    public void addClarification(Clarification clarification) {
+        clarifications.add(clarification);
+    }
+
     @Override
     public String toString() {
         return "QuestionAnswer{" +

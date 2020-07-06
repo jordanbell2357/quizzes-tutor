@@ -4,6 +4,7 @@ import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
 import pt.ulisboa.tecnico.socialsoftware.tutor.answer.AnswerService
 import pt.ulisboa.tecnico.socialsoftware.tutor.auth.AuthService
+import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.ClarificationService
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseService
 import pt.ulisboa.tecnico.socialsoftware.tutor.impexp.domain.AnswersXmlImport
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.AssessmentService
@@ -48,6 +49,11 @@ class BeanConfiguration {
     @Bean
     CourseService courseService() {
         return new CourseService()
+    }
+
+    @Bean
+    ClarificationService clarificationService() {
+        return new ClarificationService()
     }
 
     @Bean

@@ -6,6 +6,8 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.answer.AnswerService
 import pt.ulisboa.tecnico.socialsoftware.tutor.answer.repository.QuestionAnswerRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.answer.repository.QuizAnswerRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.auth.AuthService
+import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.ClarificationService
+import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.repository.ClarificationRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.config.DateHandler
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution
@@ -75,11 +77,22 @@ class SpockTest extends Specification {
 
     public static final String QUIZ_TITLE = "Quiz title"
 
+    public static final String CLARIFICATION_1_TITLE = "CLARIFICATION 1 TITLE"
+    public static final String CLARIFICATION_2_TITLE = "CLARIFICATION 2 TITLE"
+    public static final Integer CLARIFICATION_1_ID = 1
+    public static final Integer CLARIFICATION_2_ID = 2
+
     @Autowired
     AuthService authService
 
     @Autowired
     AnswerService answerService
+
+    @Autowired
+    ClarificationService clarificationService
+
+     @Autowired
+     ClarificationRepository clarificationRepository
 
     @Autowired
     AssessmentRepository assessmentRepository
