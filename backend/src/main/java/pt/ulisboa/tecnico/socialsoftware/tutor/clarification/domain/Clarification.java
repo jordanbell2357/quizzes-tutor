@@ -67,6 +67,10 @@ public class Clarification implements DomainEntity {
         this.discussionEntries = discussionEntries;
     }
 
+    public void addDiscussionEntry(DiscussionEntry discussionEntry) {
+        discussionEntries.add(discussionEntry);
+    }
+
     public QuestionAnswer getQuestionAnswer() {
         return questionAnswer;
     }

@@ -22,6 +22,7 @@ public enum ErrorMessage {
     INVALID_TYPE_FOR_QUIZ("Invalid type for quiz"),
     INVALID_QUESTION_SEQUENCE_FOR_QUIZ("Invalid question sequence for quiz"),
     CLARIFICATION_TITLE_IS_EMPTY("The title on the clarification %id is empty"),
+    CLARIFICATION_NOT_FOUND("Clarification not found with id %d"),
 
     ASSESSMENT_NOT_FOUND("Assessment not found with id %d"),
     COURSE_EXECUTION_NOT_FOUND("Course execution not found with id %d"),
