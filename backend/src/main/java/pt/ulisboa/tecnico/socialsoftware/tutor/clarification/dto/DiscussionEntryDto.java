@@ -10,16 +10,22 @@ public class DiscussionEntryDto {
 
     private String userName;
 
+    private Integer userId;
+
     private String message;
 
     private Timestamp timestamp;
+
+    private Integer id;
 
 
     public DiscussionEntryDto(DiscussionEntry discussionEntry) {
         clarificationId = discussionEntry.getClarification().getQuestionAnswer().getId();
         userName = discussionEntry.getUser().getName();
+        userId = discussionEntry.getUser().getId();
         message = discussionEntry.getMessage();
         timestamp = discussionEntry.getTimestamp();
+        id = discussionEntry.getId();
     }
 
     public DiscussionEntryDto() {
@@ -55,5 +61,21 @@ public class DiscussionEntryDto {
 
     public void setTimestamp(Timestamp timestamp) {
         this.timestamp = timestamp;
+    }
+
+    public Integer getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Integer userId) {
+        this.userId = userId;
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
     }
 }

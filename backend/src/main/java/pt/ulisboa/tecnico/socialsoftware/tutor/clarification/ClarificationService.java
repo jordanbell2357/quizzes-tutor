@@ -14,11 +14,14 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.domain.DiscussionEn
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.dto.ClarificationDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.dto.DiscussionEntryDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.repository.ClarificationRepository;
+import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.repository.DiscussionEntryRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
 import pt.ulisboa.tecnico.socialsoftware.tutor.statement.QuestionAnswerItemRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Comparator;
@@ -31,6 +34,9 @@ import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.*;
 @Service
 public class ClarificationService {
 
+    @PersistenceContext
+    EntityManager entityManager;
+
     @Autowired
     private ClarificationRepository clarificationRepository;
 
@@ -39,6 +45,9 @@ public class ClarificationService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private DiscussionEntryRepository discussionEntryRepository;
 
     @Retryable(
             value = { SQLException.class },
@@ -66,11 +75,12 @@ public class ClarificationService {
             value = { SQLException.class },
             backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.READ_COMMITTED)
-    public void addDiscussionEntry(Integer clarificationID, DiscussionEntryDto discussionEntryDto) {
+    public DiscussionEntryDto addDiscussionEntry(Integer clarificationID, DiscussionEntryDto discussionEntryDto) {
         Clarification clarification = clarificationRepository.findById(clarificationID).orElseThrow(() -> new TutorException(CLARIFICATION_NOT_FOUND, clarificationID));
-        User user = userRepository.findByUsername(discussionEntryDto.getUserName()).orElseThrow(() -> new TutorException(USER_NOT_FOUND, discussionEntryDto.getUserName()));
+        User user = userRepository.findById(discussionEntryDto.getUserId()).orElseThrow(() -> new TutorException(USER_NOT_FOUND, discussionEntryDto.getUserId()));
         DiscussionEntry discussionEntry = new DiscussionEntry(discussionEntryDto, clarification, user);
         clarification.addDiscussionEntry(discussionEntry);
+        return new DiscussionEntryDto(discussionEntry);
     }
 
     @Retryable(

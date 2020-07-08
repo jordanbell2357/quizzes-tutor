@@ -42,8 +42,7 @@ public class Clarification implements DomainEntity {
             if (!clarificationDto.getTitle().isEmpty())
                 this.title = clarificationDto.getTitle();
             else throw new TutorException(ErrorMessage.CLARIFICATION_TITLE_IS_EMPTY);
-        }
-        else throw new TutorException(ErrorMessage.CLARIFICATION_TITLE_IS_EMPTY);
+        } else throw new TutorException(ErrorMessage.CLARIFICATION_TITLE_IS_EMPTY);
     }
 
     @Override
@@ -79,4 +78,11 @@ public class Clarification implements DomainEntity {
         this.questionAnswer = questionAnswer;
     }
 
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
 }

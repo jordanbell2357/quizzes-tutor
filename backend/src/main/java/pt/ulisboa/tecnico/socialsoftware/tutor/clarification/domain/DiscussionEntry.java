@@ -1,9 +1,10 @@
 package pt.ulisboa.tecnico.socialsoftware.tutor.clarification.domain;
 
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.dto.DiscussionEntryDto;
+import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage;
+import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
 import pt.ulisboa.tecnico.socialsoftware.tutor.impexp.domain.DomainEntity;
 import pt.ulisboa.tecnico.socialsoftware.tutor.impexp.domain.Visitor;
-import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.domain.QuizQuestion;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
 
 import javax.persistence.*;
@@ -34,8 +35,16 @@ public class DiscussionEntry implements DomainEntity {
     public DiscussionEntry(DiscussionEntryDto discussionEntryDto, Clarification clarification, User user) {
         this.clarification = clarification;
         this.user = user;
-        this.message = discussionEntryDto.getMessage();
         this.timestamp = new Timestamp(System.currentTimeMillis());
+        this.id = discussionEntryDto.getId();
+        if (discussionEntryDto.getMessage() != null) {
+            if (!discussionEntryDto.getMessage().isEmpty()) {
+                this.message = discussionEntryDto.getMessage();
+            }
+            else throw new TutorException(ErrorMessage.DISCUSSION_ENTRY_TITLE_IS_EMPTY);
+        }
+        else throw new TutorException(ErrorMessage.DISCUSSION_ENTRY_TITLE_IS_EMPTY);
+
     }
 
     @Override
@@ -73,5 +82,13 @@ public class DiscussionEntry implements DomainEntity {
 
     public void setTimestamp(Timestamp timestamp) {
         this.timestamp = timestamp;
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
     }
 }
