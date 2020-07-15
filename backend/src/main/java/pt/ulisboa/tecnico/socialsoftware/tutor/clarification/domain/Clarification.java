@@ -20,7 +20,7 @@ public class Clarification implements DomainEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "clarification", fetch=FetchType.LAZY, orphanRemoval=true)
+    @OneToMany(mappedBy = "clarification", fetch=FetchType.LAZY, orphanRemoval=true)
     private Set<DiscussionEntry> discussionEntries = new HashSet<>();
 
     @Column(name = "title")
