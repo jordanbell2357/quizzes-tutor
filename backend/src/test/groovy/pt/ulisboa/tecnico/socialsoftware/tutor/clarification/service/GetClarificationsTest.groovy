@@ -7,7 +7,6 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.SpockTest
 import pt.ulisboa.tecnico.socialsoftware.tutor.answer.domain.QuestionAnswer
 import pt.ulisboa.tecnico.socialsoftware.tutor.answer.domain.QuizAnswer
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.domain.Clarification
-import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.domain.DiscussionEntry
 import pt.ulisboa.tecnico.socialsoftware.tutor.config.DateHandler
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Question
 import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.domain.Quiz
@@ -15,7 +14,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.domain.QuizQuestion
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User
 
 @DataJpaTest
-class GetClarificationTest extends SpockTest {
+class GetClarificationsTest extends SpockTest {
     def questionAnswer
     def user
     def quiz
@@ -52,50 +51,55 @@ class GetClarificationTest extends SpockTest {
         questionAnswer.setQuizQuestion(quizQuestion)
         questionAnswer.setQuizAnswer(quizAnswer)
         questionAnswerRepository.save(questionAnswer)
+    }
 
+    def 'Getting an existing clarification'(){
+        given: 'a clarification and a questionAnswer'
         def clarification = new Clarification()
+        def questionAnswer = questionAnswerRepository.findAll().get(0)
         clarification.setQuestionAnswer(questionAnswer)
         clarification.setTitle(CLARIFICATION_1_TITLE)
-        clarification.setId(CLARIFICATION_1_ID)
+        questionAnswer.addClarification(clarification)
         clarificationRepository.save(clarification)
-    }
-
-    def 'Getting an existing clarification, with no discussionEntry'(){
-        given: 'a clarification'
-        def id = clarificationRepository.findAll().get(0).getId()
 
         when:
-        def clarificationDto = clarificationService.getClarification(id)
-
+        def clarificationDtos = clarificationService.getClarifications(questionAnswer.getId())
         then:
-        clarificationDto.id == id
-        clarificationDto.title == CLARIFICATION_1_TITLE
-        clarificationDto.discussionEntryDtoList.size() == 0
+        clarificationDtos.size() == 1
+        clarificationDtos.get(0).getTitle() == CLARIFICATION_1_TITLE
+        clarificationDtos.get(0).getQuestionAnswerId() == questionAnswer.getId()
     }
 
-    def 'Getting an existing clarification, with discussionEntry'(){
-        given: 'a discussionEntry'
-        def clarificationL = clarificationRepository.findAll().get(0)
-        def discussionEntry = new DiscussionEntry()
-        def user = userRepository.findAll().get(0)
-        discussionEntry.setId(DISCUSSION_ENTRY_1_ID)
-        discussionEntry.setMessage(DISCUSSION_1_MESSAGE)
-        discussionEntry.setUser(user)
-        clarificationL.addDiscussionEntry(discussionEntry)
-        discussionEntry.setClarification(clarificationL)
-        discussionEntryRepository.save(discussionEntry)
+    def 'Two clarifications sorted by title'(){
+        given: 'two clarifications and a questionAnswer'
+        def clarification1 = new Clarification()
+        clarification1.setTitle(CLARIFICATION_1_TITLE)
+
+        def clarification2 = new Clarification()
+        clarification2.setTitle(CLARIFICATION_2_TITLE)
+
+        def questionAnswer = questionAnswerRepository.findAll().get(0)
+
+        and: 'Saving the clarification on the questionAnswer'
+        clarification1.setQuestionAnswer(questionAnswer)
+        clarification2.setQuestionAnswer(questionAnswer)
+        questionAnswer.addClarification(clarification2)
+        questionAnswer.addClarification(clarification1)
+
+        clarificationRepository.save(clarification1)
+        clarificationRepository.save(clarification2)
 
         when:
-        def clarificationDto = clarificationService.getClarification(clarificationL.getId())
+        def clarificationDtos = clarificationService.getClarifications(questionAnswer.getId())
 
         then:
-        clarificationDto.id == clarificationL.getId()
-        clarificationDto.title == CLARIFICATION_1_TITLE
-        clarificationDto.discussionEntryDtoList.size() == 1
-        clarificationDto.discussionEntryDtoList.get(0).getId() == DISCUSSION_ENTRY_1_ID
-        clarificationDto.discussionEntryDtoList.get(0).getMessage() == DISCUSSION_1_MESSAGE
-    }
+        clarificationDtos.size() == 2
+        def clarificationX = clarificationDtos.get(0)
+        def clarificationY = clarificationDtos.get(1)
 
+        clarificationX.getTitle() == CLARIFICATION_1_TITLE
+        clarificationY.getTitle() == CLARIFICATION_2_TITLE
+    }
 
     def 'Getting an non-existing clarification'(){
         given: 'A questionAnswer'

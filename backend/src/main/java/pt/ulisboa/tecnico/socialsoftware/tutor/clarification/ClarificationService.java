@@ -24,6 +24,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -50,11 +51,11 @@ public class ClarificationService {
     private DiscussionEntryRepository discussionEntryRepository;
 
     @Retryable(
-            value = { SQLException.class },
+            value = {SQLException.class},
             backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.READ_COMMITTED)
-    public ClarificationDto createClarification (Integer questionAnswerId, ClarificationDto clarificationDto) {
-        QuestionAnswer questionAnswer =  questionAnswerRepository.findById(questionAnswerId).orElseThrow(() -> new TutorException(QUESTION_ANSWER_NOT_FOUND, questionAnswerId));
+    public ClarificationDto createClarification(Integer questionAnswerId, ClarificationDto clarificationDto) {
+        QuestionAnswer questionAnswer = questionAnswerRepository.findById(questionAnswerId).orElseThrow(() -> new TutorException(QUESTION_ANSWER_NOT_FOUND, questionAnswerId));
         Clarification clarification = new Clarification(clarificationDto, questionAnswer);
         questionAnswer.addClarification(clarification);
         clarificationRepository.save(clarification);
@@ -63,16 +64,25 @@ public class ClarificationService {
     }
 
     @Retryable(
-            value = { SQLException.class },
+            value = {SQLException.class},
             backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.READ_COMMITTED)
-    public List<ClarificationDto> getClarifications (Integer questionAnswerId) {
-        QuestionAnswer questionAnswer =  questionAnswerRepository.findById(questionAnswerId).orElseThrow(() -> new TutorException(QUESTION_ANSWER_NOT_FOUND, questionAnswerId));
+    public List<ClarificationDto> getClarifications(Integer questionAnswerId) {
+        QuestionAnswer questionAnswer = questionAnswerRepository.findById(questionAnswerId).orElseThrow(() -> new TutorException(QUESTION_ANSWER_NOT_FOUND, questionAnswerId));
         return questionAnswer.getClarifications().stream().sorted(Comparator.comparing(Clarification::getTitle)).map(ClarificationDto::new).collect(Collectors.toList());
     }
 
     @Retryable(
-            value = { SQLException.class },
+            value = {SQLException.class},
+            backoff = @Backoff(delay = 5000))
+    @Transactional(isolation = Isolation.READ_COMMITTED)
+    public ClarificationDto getClarification(Integer clarification) {
+        Clarification clarification1 = clarificationRepository.findById(clarification).orElseThrow(() -> new TutorException(CLARIFICATION_NOT_FOUND, clarification));
+        return new ClarificationDto(clarification1);
+    }
+
+    @Retryable(
+            value = {SQLException.class},
             backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.READ_COMMITTED)
     public DiscussionEntryDto addDiscussionEntry(Integer clarificationID, DiscussionEntryDto discussionEntryDto) {
@@ -84,7 +94,7 @@ public class ClarificationService {
     }
 
     @Retryable(
-            value = { SQLException.class },
+            value = {SQLException.class},
             backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.READ_COMMITTED)
     public List<DiscussionEntryDto> getDiscussionEntries(Integer clarificationId) {
@@ -92,5 +102,14 @@ public class ClarificationService {
         return clarification.getDiscussionEntries().stream().sorted(Comparator.comparing(DiscussionEntry::getTimestamp)).map(DiscussionEntryDto::new).collect(Collectors.toList());
     }
 
-
+    @Retryable(
+            value = {SQLException.class},
+            backoff = @Backoff(delay = 5000))
+    @Transactional(isolation = Isolation.READ_COMMITTED)
+    public ClarificationDto newClarification(DiscussionEntryDto discussionEntryDto, ClarificationDto clarificationDto) {
+        ClarificationDto clarificationDto1 = this.createClarification(clarificationDto.getQuestionAnswerId(), clarificationDto);
+        DiscussionEntryDto discussionEntryDto1 = this.addDiscussionEntry(clarificationDto1.getId(), discussionEntryDto);
+        clarificationDto1.addDiscussionEntryDto(discussionEntryDto1);
+        return clarificationDto1;
+    }
 }

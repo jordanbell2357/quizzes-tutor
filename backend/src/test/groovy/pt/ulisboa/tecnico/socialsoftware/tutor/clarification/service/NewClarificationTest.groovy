@@ -8,6 +8,8 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.answer.domain.QuestionAnswer
 import pt.ulisboa.tecnico.socialsoftware.tutor.answer.domain.QuizAnswer
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.domain.Clarification
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.domain.DiscussionEntry
+import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.dto.ClarificationDto
+import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.dto.DiscussionEntryDto
 import pt.ulisboa.tecnico.socialsoftware.tutor.config.DateHandler
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Question
 import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.domain.Quiz
@@ -15,7 +17,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.domain.QuizQuestion
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User
 
 @DataJpaTest
-class GetClarificationTest extends SpockTest {
+class NewClarificationTest extends SpockTest {
     def questionAnswer
     def user
     def quiz
@@ -52,60 +54,29 @@ class GetClarificationTest extends SpockTest {
         questionAnswer.setQuizQuestion(quizQuestion)
         questionAnswer.setQuizAnswer(quizAnswer)
         questionAnswerRepository.save(questionAnswer)
+    }
 
-        def clarification = new Clarification()
-        clarification.setQuestionAnswer(questionAnswer)
+    def 'Creating a new Clarification with a DiscussionEntry'(){
+        given: 'A Clarification'
+        def clarification = new ClarificationDto();
         clarification.setTitle(CLARIFICATION_1_TITLE)
         clarification.setId(CLARIFICATION_1_ID)
-        clarificationRepository.save(clarification)
-    }
+        clarification.setQuestionAnswerId(questionAnswerRepository.findAll().get(0).getId())
 
-    def 'Getting an existing clarification, with no discussionEntry'(){
-        given: 'a clarification'
-        def id = clarificationRepository.findAll().get(0).getId()
-
-        when:
-        def clarificationDto = clarificationService.getClarification(id)
-
-        then:
-        clarificationDto.id == id
-        clarificationDto.title == CLARIFICATION_1_TITLE
-        clarificationDto.discussionEntryDtoList.size() == 0
-    }
-
-    def 'Getting an existing clarification, with discussionEntry'(){
-        given: 'a discussionEntry'
-        def clarificationL = clarificationRepository.findAll().get(0)
-        def discussionEntry = new DiscussionEntry()
-        def user = userRepository.findAll().get(0)
-        discussionEntry.setId(DISCUSSION_ENTRY_1_ID)
+        def discussionEntry = new DiscussionEntryDto()
         discussionEntry.setMessage(DISCUSSION_1_MESSAGE)
-        discussionEntry.setUser(user)
-        clarificationL.addDiscussionEntry(discussionEntry)
-        discussionEntry.setClarification(clarificationL)
-        discussionEntryRepository.save(discussionEntry)
+        discussionEntry.setClarificationId(clarification.getId())
+        discussionEntry.setUserId(userRepository.findAll().get(0).getId())
 
         when:
-        def clarificationDto = clarificationService.getClarification(clarificationL.getId())
+        def clarificationDto = clarificationService.newClarification(discussionEntry, clarification)
 
         then:
-        clarificationDto.id == clarificationL.getId()
-        clarificationDto.title == CLARIFICATION_1_TITLE
+        clarificationDto.id == clarification.getId()
         clarificationDto.discussionEntryDtoList.size() == 1
-        clarificationDto.discussionEntryDtoList.get(0).getId() == DISCUSSION_ENTRY_1_ID
-        clarificationDto.discussionEntryDtoList.get(0).getMessage() == DISCUSSION_1_MESSAGE
+        clarificationDto.discussionEntryDtoList.get(0).message == DISCUSSION_1_MESSAGE
     }
 
-
-    def 'Getting an non-existing clarification'(){
-        given: 'A questionAnswer'
-        def questionAnswer = questionAnswerRepository.findAll().get(0)
-
-        when:
-        def clarificationDtos = clarificationService.getClarifications(questionAnswer.getId())
-        then:
-        clarificationDtos.size() == 0
-    }
 
 
     @TestConfiguration
