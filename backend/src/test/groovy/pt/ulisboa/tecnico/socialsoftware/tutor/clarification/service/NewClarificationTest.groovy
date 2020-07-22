@@ -11,10 +11,14 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.domain.DiscussionEn
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.dto.ClarificationDto
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.dto.DiscussionEntryDto
 import pt.ulisboa.tecnico.socialsoftware.tutor.config.DateHandler
+import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Question
 import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.domain.Quiz
 import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.domain.QuizQuestion
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User
+
+import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.CLARIFICATION_EMPTY_DISCUSSION_ENTRY
+import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.DISCUSSION_ENTRY_TITLE_IS_EMPTY
 
 @DataJpaTest
 class NewClarificationTest extends SpockTest {
@@ -67,9 +71,12 @@ class NewClarificationTest extends SpockTest {
         discussionEntry.setMessage(DISCUSSION_1_MESSAGE)
         discussionEntry.setClarificationId(clarification.getId())
         discussionEntry.setUserId(userRepository.findAll().get(0).getId())
+        ArrayList<DiscussionEntryDto> discussionEntryDtoArrayList = new ArrayList<DiscussionEntryDto>()
+        discussionEntryDtoArrayList.add(discussionEntry)
+        clarification.setDiscussionEntryDtoList(discussionEntryDtoArrayList)
 
         when:
-        def clarificationDto = clarificationService.newClarification(discussionEntry, clarification)
+        def clarificationDto = clarificationService.newClarification(clarification)
 
         then:
         clarificationDto.id == clarification.getId()
@@ -77,8 +84,29 @@ class NewClarificationTest extends SpockTest {
         clarificationDto.discussionEntryDtoList.get(0).message == DISCUSSION_1_MESSAGE
     }
 
+    def 'Creating a new Clarification with no DiscussionEntry'(){
+        given: 'A clarification'
+        def clarification = new ClarificationDto();
+        clarification.setTitle(CLARIFICATION_1_TITLE)
+        clarification.setId(CLARIFICATION_1_ID)
+        clarification.setQuestionAnswerId(questionAnswerRepository.findAll().get(0).getId())
 
 
-    @TestConfiguration
+        when:
+        clarificationService.newClarification(clarification)
+
+        then:
+
+        clarificationRepository.findAll().size() == 0
+        TutorException exception = thrown()
+        exception.getErrorMessage() == CLARIFICATION_EMPTY_DISCUSSION_ENTRY
+
+
+    }
+
+
+
+
+        @TestConfiguration
     static class LocalBeanConfiguration extends BeanConfiguration {}
 }
