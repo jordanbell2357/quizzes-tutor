@@ -13,6 +13,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
 
 import javax.validation.Valid;
 import java.security.Principal;
+import java.util.List;
 
 @RestController
 public class ClarificationController {
@@ -24,8 +25,8 @@ public class ClarificationController {
     ClarificationRepository clarificationRepository;
 
     @PostMapping("/clarification/create")
-    public ClarificationDto createClarification(@Valid @RequestBody ClarificationDto clarificationDto, @Valid @RequestBody DiscussionEntryDto discussionEntryDto) {
-        return clarificationService.newClarification(discussionEntryDto, clarificationDto);
+    public ClarificationDto createClarification(@Valid @RequestBody ClarificationDto clarificationDto) {
+        return clarificationService.newClarification(clarificationDto);
     }
 
     @PostMapping("/clarification/{clarificationId}/add")
@@ -37,4 +38,12 @@ public class ClarificationController {
     public ClarificationDto getClarification(@PathVariable Integer clarificationId) {
         return clarificationService.getClarification(clarificationId);
     }
+
+    @GetMapping("/question-answer/{questionAnswerId}/clarifications")
+    public List<ClarificationDto> getQAClarifications(@PathVariable Integer questionAnswerId) {
+        return clarificationService.getClarifications(questionAnswerId);
+    }
+
+
+
 }

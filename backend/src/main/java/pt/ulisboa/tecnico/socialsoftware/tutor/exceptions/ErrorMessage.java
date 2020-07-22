@@ -24,6 +24,7 @@ public enum ErrorMessage {
     CLARIFICATION_TITLE_IS_EMPTY("The title on the clarification %id is empty"),
     CLARIFICATION_NOT_FOUND("Clarification not found with id %d"),
     DISCUSSION_ENTRY_TITLE_IS_EMPTY("The title on the discussion is empty"),
+    CLARIFICATION_EMPTY_DISCUSSION_ENTRY("Clarification has empty discussion entries"),
 
     ASSESSMENT_NOT_FOUND("Assessment not found with id %d"),
     COURSE_EXECUTION_NOT_FOUND("Course execution not found with id %d"),

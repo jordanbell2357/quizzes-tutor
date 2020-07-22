@@ -89,6 +89,7 @@ public class ClarificationService {
         Clarification clarification = clarificationRepository.findById(clarificationID).orElseThrow(() -> new TutorException(CLARIFICATION_NOT_FOUND, clarificationID));
         User user = userRepository.findById(discussionEntryDto.getUserId()).orElseThrow(() -> new TutorException(USER_NOT_FOUND, discussionEntryDto.getUserId()));
         DiscussionEntry discussionEntry = new DiscussionEntry(discussionEntryDto, clarification, user);
+        discussionEntryRepository.save(discussionEntry);
         clarification.addDiscussionEntry(discussionEntry);
         return new DiscussionEntryDto(discussionEntry);
     }
@@ -106,10 +107,15 @@ public class ClarificationService {
             value = {SQLException.class},
             backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.READ_COMMITTED)
-    public ClarificationDto newClarification(DiscussionEntryDto discussionEntryDto, ClarificationDto clarificationDto) {
-        ClarificationDto clarificationDto1 = this.createClarification(clarificationDto.getQuestionAnswerId(), clarificationDto);
-        DiscussionEntryDto discussionEntryDto1 = this.addDiscussionEntry(clarificationDto1.getId(), discussionEntryDto);
-        clarificationDto1.addDiscussionEntryDto(discussionEntryDto1);
-        return clarificationDto1;
+    public ClarificationDto newClarification(ClarificationDto clarificationDto) {
+        if (clarificationDto.getDiscussionEntryDtoList()!= null) {
+            if (!clarificationDto.getDiscussionEntryDtoList().isEmpty()) {
+                ClarificationDto clarificationDto1 = this.createClarification(clarificationDto.getQuestionAnswerId(), clarificationDto);
+                DiscussionEntryDto discussionEntryDto1 = this.addDiscussionEntry(clarificationDto1.getId(), clarificationDto.getDiscussionEntryDtoList().get(0));
+                clarificationDto1.addDiscussionEntryDto(discussionEntryDto1);
+                return clarificationDto1;
+            }
+        }
+        throw new TutorException(CLARIFICATION_EMPTY_DISCUSSION_ENTRY);
     }
 }
