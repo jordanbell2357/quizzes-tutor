@@ -74,9 +74,11 @@ class NewClarificationTest extends SpockTest {
         ArrayList<DiscussionEntryDto> discussionEntryDtoArrayList = new ArrayList<DiscussionEntryDto>()
         discussionEntryDtoArrayList.add(discussionEntry)
         clarification.setDiscussionEntryDtoList(discussionEntryDtoArrayList)
+        def user = userRepository.findAll().get(0)
+
 
         when:
-        def clarificationDto = clarificationService.newClarification(clarification)
+        def clarificationDto = clarificationService.newClarification(clarification, user.getKey())
 
         then:
         clarificationDto.id == clarification.getId()
@@ -90,10 +92,12 @@ class NewClarificationTest extends SpockTest {
         clarification.setTitle(CLARIFICATION_1_TITLE)
         clarification.setId(CLARIFICATION_1_ID)
         clarification.setQuestionAnswerId(questionAnswerRepository.findAll().get(0).getId())
+        def user = userRepository.findAll().get(0)
+
 
 
         when:
-        clarificationService.newClarification(clarification)
+        clarificationService.newClarification(clarification, user.getKey())
 
         then:
 

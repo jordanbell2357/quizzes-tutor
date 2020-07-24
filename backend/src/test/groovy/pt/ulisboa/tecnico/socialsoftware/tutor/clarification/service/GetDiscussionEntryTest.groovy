@@ -56,6 +56,7 @@ class GetDiscussionEntryTest extends SpockTest {
         def clarification = new Clarification()
         clarification.setQuestionAnswer(questionAnswer)
         clarification.setTitle(CLARIFICATION_1_TITLE)
+        clarification.setUser(userRepository.findAll().get(0))
         clarificationRepository.save(clarification)
     }
 

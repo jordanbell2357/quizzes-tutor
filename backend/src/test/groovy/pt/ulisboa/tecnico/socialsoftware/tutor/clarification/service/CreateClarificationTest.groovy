@@ -63,9 +63,10 @@ class CreateClarificationTest extends SpockTest {
         def clarificationDto = new ClarificationDto()
         clarificationDto.setTitle(CLARIFICATION_1_TITLE)
         clarificationDto.setQuestionAnswerId(questionAnswerId)
+        def user = userRepository.findAll().get(0)
 
         when:
-        clarificationService.createClarification(questionAnswerId, clarificationDto)
+        clarificationService.createClarification(questionAnswerId, clarificationDto, user)
 
         then:
         clarificationRepository.findAll().get(0).getTitle() == CLARIFICATION_1_TITLE
@@ -80,9 +81,10 @@ class CreateClarificationTest extends SpockTest {
         and: 'A ClarificationDto with no title'
         def clarificationDto = new ClarificationDto()
         clarificationDto.setQuestionAnswerId(questionAnswerId)
+        def user = userRepository.findAll().get(0)
 
         when:
-        clarificationService.createClarification(questionAnswerId, clarificationDto)
+        clarificationService.createClarification(questionAnswerId, clarificationDto, user)
 
         then:
         TutorException exception = thrown()
@@ -97,9 +99,10 @@ class CreateClarificationTest extends SpockTest {
         def clarificationDto = new ClarificationDto()
         clarificationDto.setTitle('')
         clarificationDto.setQuestionAnswerId(questionAnswerId)
+        def user = userRepository.findAll().get(0)
 
         when:
-        clarificationService.createClarification(questionAnswerId, clarificationDto)
+        clarificationService.createClarification(questionAnswerId, clarificationDto, user)
 
         then:
         TutorException exception = thrown()

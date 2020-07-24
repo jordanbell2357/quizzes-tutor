@@ -57,6 +57,7 @@ class GetClarificationTest extends SpockTest {
         clarification.setQuestionAnswer(questionAnswer)
         clarification.setTitle(CLARIFICATION_1_TITLE)
         clarification.setId(CLARIFICATION_1_ID)
+        clarification.setUser(userRepository.findAll().get(0))
         clarificationRepository.save(clarification)
     }
 

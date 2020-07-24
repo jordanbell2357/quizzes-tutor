@@ -60,6 +60,7 @@ class GetClarificationsTest extends SpockTest {
         clarification.setQuestionAnswer(questionAnswer)
         clarification.setTitle(CLARIFICATION_1_TITLE)
         questionAnswer.addClarification(clarification)
+        clarification.setUser(userRepository.findAll().get(0))
         clarificationRepository.save(clarification)
 
         when:
@@ -74,9 +75,11 @@ class GetClarificationsTest extends SpockTest {
         given: 'two clarifications and a questionAnswer'
         def clarification1 = new Clarification()
         clarification1.setTitle(CLARIFICATION_1_TITLE)
+        clarification1.setUser(userRepository.findAll().get(0))
 
         def clarification2 = new Clarification()
         clarification2.setTitle(CLARIFICATION_2_TITLE)
+        clarification2.setUser(userRepository.findAll().get(0))
 
         def questionAnswer = questionAnswerRepository.findAll().get(0)
 
