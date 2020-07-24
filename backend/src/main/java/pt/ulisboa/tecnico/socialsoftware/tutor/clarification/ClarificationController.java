@@ -1,6 +1,7 @@
 package pt.ulisboa.tecnico.socialsoftware.tutor.clarification;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import pt.ulisboa.tecnico.socialsoftware.tutor.TutorApplication;
@@ -25,21 +26,25 @@ public class ClarificationController {
     ClarificationRepository clarificationRepository;
 
     @PostMapping("/clarification/create")
+    @PreAuthorize("hasRole('ROLE_STUDENT') and hasPermission(#clarificationDto.questionAnswerId, 'QA.ACCESS')")
     public ClarificationDto createClarification(@Valid @RequestBody ClarificationDto clarificationDto) {
         return clarificationService.newClarification(clarificationDto);
     }
 
     @PostMapping("/clarification/{clarificationId}/add")
+    @PreAuthorize("hasRole('ROLE_TEACHER') or (hasRole('ROLE_STUDENT') and hasPermission(#clarificationId, 'CLARIFICATION.ACCESS'))")
     public DiscussionEntryDto addDiscussionEntry(@Valid @RequestBody DiscussionEntryDto discussionEntryDto, @PathVariable Integer clarificationId) {
         return clarificationService.addDiscussionEntry(clarificationId, discussionEntryDto);
     }
 
     @GetMapping("/clarification/{clarificationId}/get")
+    @PreAuthorize("hasRole('ROLE_TEACHER') or (hasRole('ROLE_STUDENT') and hasPermission(#clarificationId, 'CLARIFICATION.ACCESS'))")
     public ClarificationDto getClarification(@PathVariable Integer clarificationId) {
         return clarificationService.getClarification(clarificationId);
     }
 
     @GetMapping("/question-answer/{questionAnswerId}/clarifications")
+    @PreAuthorize("hasRole('ROLE_TEACHER')")
     public List<ClarificationDto> getQAClarifications(@PathVariable Integer questionAnswerId) {
         return clarificationService.getClarifications(questionAnswerId);
     }

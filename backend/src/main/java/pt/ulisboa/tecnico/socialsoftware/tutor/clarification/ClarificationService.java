@@ -118,4 +118,13 @@ public class ClarificationService {
         }
         throw new TutorException(CLARIFICATION_EMPTY_DISCUSSION_ENTRY);
     }
+
+    @Retryable(
+            value = {SQLException.class},
+            backoff = @Backoff(delay = 5000))
+    @Transactional(isolation = Isolation.READ_COMMITTED)
+    public boolean userHasCreated(int clarificationId, int userId) {
+        Clarification clarification = clarificationRepository.findById(clarificationId).orElseThrow(() -> new TutorException(CLARIFICATION_NOT_FOUND, clarificationId));
+        return clarification.getQuestionAnswer().getQuizAnswer().getUser().getKey() == userId;
+    }
 }

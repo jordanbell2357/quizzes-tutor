@@ -4,8 +4,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.PermissionEvaluator;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
+import pt.ulisboa.tecnico.socialsoftware.tutor.answer.domain.QuestionAnswer;
+import pt.ulisboa.tecnico.socialsoftware.tutor.answer.repository.QuestionAnswerRepository;
+import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.ClarificationService;
+import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.domain.Clarification;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseService;
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.QuestionService;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Question;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Topic;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.AssessmentRepository;
@@ -33,6 +38,9 @@ public class TutorPermissionEvaluator implements PermissionEvaluator {
     private AssessmentRepository assessmentRepository;
 
     @Autowired
+    private QuestionAnswerRepository questionAnswerRepository;
+
+    @Autowired
     private QuizRepository quizRepository;
 
     @Autowired
@@ -40,6 +48,12 @@ public class TutorPermissionEvaluator implements PermissionEvaluator {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private QuestionService questionService;
+
+    @Autowired
+    private ClarificationService clarificationService;
 
     @Override
     public boolean hasPermission(Authentication authentication, Object targetDomainObject, Object permission) {
@@ -75,6 +89,10 @@ public class TutorPermissionEvaluator implements PermissionEvaluator {
                         return userService.userHasAnExecutionOfCourse(userId, question.getCourse().getId());
                     }
                     return false;
+                case "QA.ACCESS":
+                    return questionService.userHasAnswered(userId, id);
+                case "CLARIFICATION.ACCESS":
+                    return clarificationService.userHasCreated(id, userId);
                 case "TOPIC.ACCESS":
                     Topic topic = topicRepository.findTopicWithCourseById(id).orElse(null);
                     if (topic != null) {
