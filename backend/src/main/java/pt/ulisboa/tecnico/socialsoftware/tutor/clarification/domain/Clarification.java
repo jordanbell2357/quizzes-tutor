@@ -7,6 +7,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
 import pt.ulisboa.tecnico.socialsoftware.tutor.impexp.domain.DomainEntity;
 import pt.ulisboa.tecnico.socialsoftware.tutor.impexp.domain.Visitor;
 import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.domain.QuizQuestion;
+import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
 
 import javax.persistence.*;
 import java.util.HashSet;
@@ -30,18 +31,23 @@ public class Clarification implements DomainEntity {
     @JoinColumn(name = "question_answer_id")
     private QuestionAnswer questionAnswer;
 
+    @ManyToOne(fetch = FetchType.LAZY, optional=false)
+    @JoinColumn(name = "user_id")
+    private User user;
+
     public Clarification() {}
 
     public Clarification(String title) {
         this.title = title;
     }
 
-    public Clarification(ClarificationDto clarificationDto, QuestionAnswer questionAnswer) {
-        this.questionAnswer = questionAnswer;
+    public Clarification(ClarificationDto clarificationDto, QuestionAnswer questionAnswer, User user) {
         if (clarificationDto.getTitle() != null) {
-            if (!clarificationDto.getTitle().isEmpty())
+            if (!clarificationDto.getTitle().isEmpty()) {
+                this.questionAnswer = questionAnswer;
                 this.title = clarificationDto.getTitle();
-            else throw new TutorException(ErrorMessage.CLARIFICATION_TITLE_IS_EMPTY);
+                this.user = user;
+            } else throw new TutorException(ErrorMessage.CLARIFICATION_TITLE_IS_EMPTY);
         } else throw new TutorException(ErrorMessage.CLARIFICATION_TITLE_IS_EMPTY);
     }
 
@@ -84,5 +90,13 @@ public class Clarification implements DomainEntity {
 
     public void setId(Integer id) {
         this.id = id;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 }

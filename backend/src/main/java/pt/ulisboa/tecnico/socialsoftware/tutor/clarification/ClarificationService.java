@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import pt.ulisboa.tecnico.socialsoftware.tutor.answer.domain.QuestionAnswer;
+import pt.ulisboa.tecnico.socialsoftware.tutor.answer.domain.QuizAnswer;
 import pt.ulisboa.tecnico.socialsoftware.tutor.answer.repository.QuestionAnswerRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.domain.Clarification;
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.domain.DiscussionEntry;
@@ -54,9 +55,9 @@ public class ClarificationService {
             value = {SQLException.class},
             backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.READ_COMMITTED)
-    public ClarificationDto createClarification(Integer questionAnswerId, ClarificationDto clarificationDto) {
+    public ClarificationDto createClarification(Integer questionAnswerId, ClarificationDto clarificationDto, User user) {
         QuestionAnswer questionAnswer = questionAnswerRepository.findById(questionAnswerId).orElseThrow(() -> new TutorException(QUESTION_ANSWER_NOT_FOUND, questionAnswerId));
-        Clarification clarification = new Clarification(clarificationDto, questionAnswer);
+        Clarification clarification = new Clarification(clarificationDto, questionAnswer, user);
         questionAnswer.addClarification(clarification);
         clarificationRepository.save(clarification);
 
@@ -86,12 +87,14 @@ public class ClarificationService {
             backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.READ_COMMITTED)
     public DiscussionEntryDto addDiscussionEntry(Integer clarificationID, DiscussionEntryDto discussionEntryDto) {
-        Clarification clarification = clarificationRepository.findById(clarificationID).orElseThrow(() -> new TutorException(CLARIFICATION_NOT_FOUND, clarificationID));
-        User user = userRepository.findById(discussionEntryDto.getUserId()).orElseThrow(() -> new TutorException(USER_NOT_FOUND, discussionEntryDto.getUserId()));
-        DiscussionEntry discussionEntry = new DiscussionEntry(discussionEntryDto, clarification, user);
-        discussionEntryRepository.save(discussionEntry);
-        clarification.addDiscussionEntry(discussionEntry);
-        return new DiscussionEntryDto(discussionEntry);
+        if (clarificationID.equals(discussionEntryDto.getClarificationId())) {
+            Clarification clarification = clarificationRepository.findById(clarificationID).orElseThrow(() -> new TutorException(CLARIFICATION_NOT_FOUND, clarificationID));
+            User user = userRepository.findById(discussionEntryDto.getUserId()).orElseThrow(() -> new TutorException(USER_NOT_FOUND, discussionEntryDto.getUserId()));
+            DiscussionEntry discussionEntry = new DiscussionEntry(discussionEntryDto, clarification, user);
+            discussionEntryRepository.save(discussionEntry);
+            clarification.addDiscussionEntry(discussionEntry);
+            return new DiscussionEntryDto(discussionEntry);
+        } else throw new TutorException(DISCUSSION_ENTRY_CLARIFICATION_ID);
     }
 
     @Retryable(
@@ -107,10 +110,11 @@ public class ClarificationService {
             value = {SQLException.class},
             backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.READ_COMMITTED)
-    public ClarificationDto newClarification(ClarificationDto clarificationDto) {
+    public ClarificationDto newClarification(ClarificationDto clarificationDto, int userKey) {
         if (clarificationDto.getDiscussionEntryDtoList()!= null) {
             if (!clarificationDto.getDiscussionEntryDtoList().isEmpty()) {
-                ClarificationDto clarificationDto1 = this.createClarification(clarificationDto.getQuestionAnswerId(), clarificationDto);
+                User user = userRepository.findByKey(userKey).orElseThrow(() -> new TutorException(USER_NOT_FOUND, userKey));
+                ClarificationDto clarificationDto1 = this.createClarification(clarificationDto.getQuestionAnswerId(), clarificationDto, user);
                 DiscussionEntryDto discussionEntryDto1 = this.addDiscussionEntry(clarificationDto1.getId(), clarificationDto.getDiscussionEntryDtoList().get(0));
                 clarificationDto1.addDiscussionEntryDto(discussionEntryDto1);
                 return clarificationDto1;
@@ -126,5 +130,17 @@ public class ClarificationService {
     public boolean userHasCreated(int clarificationId, int userId) {
         Clarification clarification = clarificationRepository.findById(clarificationId).orElseThrow(() -> new TutorException(CLARIFICATION_NOT_FOUND, clarificationId));
         return clarification.getQuestionAnswer().getQuizAnswer().getUser().getKey() == userId;
+    }
+
+    @Retryable(
+            value = {SQLException.class},
+            backoff = @Backoff(delay = 5000))
+    @Transactional(isolation = Isolation.READ_COMMITTED)
+    public List<ClarificationDto> getAllClarifications(Integer key) {
+        User user = userRepository.findByKey(key).orElseThrow(() -> new TutorException(USER_NOT_FOUND, key));
+        return user.getClarifications().stream()
+                .sorted(Comparator.comparing(Clarification::getTitle))
+                .map(ClarificationDto::new)
+                .collect(Collectors.toList());
     }
 }
