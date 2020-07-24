@@ -27,8 +27,9 @@ public class ClarificationController {
 
     @PostMapping("/clarification/create")
     @PreAuthorize("hasRole('ROLE_STUDENT') and hasPermission(#clarificationDto.questionAnswerId, 'QA.ACCESS')")
-    public ClarificationDto createClarification(@Valid @RequestBody ClarificationDto clarificationDto) {
-        return clarificationService.newClarification(clarificationDto);
+    public ClarificationDto createClarification(@Valid @RequestBody ClarificationDto clarificationDto, Principal principal) {
+        User user = (User) ((Authentication) principal).getPrincipal();
+        return clarificationService.newClarification(clarificationDto, user.getKey());
     }
 
     @PostMapping("/clarification/{clarificationId}/add")
@@ -48,6 +49,14 @@ public class ClarificationController {
     public List<ClarificationDto> getQAClarifications(@PathVariable Integer questionAnswerId) {
         return clarificationService.getClarifications(questionAnswerId);
     }
+
+    @GetMapping("/clarification/get")
+    @PreAuthorize("hasRole('ROLE_STUDENT')")
+    public List<ClarificationDto> getAllClarifications(Principal principal) {
+        User user = (User) ((Authentication) principal).getPrincipal();
+        return clarificationService.getAllClarifications(user.getKey());
+    }
+
 
 
 
