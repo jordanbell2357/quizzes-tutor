@@ -20,7 +20,7 @@ public class DiscussionEntryDto {
 
 
     public DiscussionEntryDto(DiscussionEntry discussionEntry) {
-        clarificationId = discussionEntry.getClarification().getQuestionAnswer().getId();
+        clarificationId = discussionEntry.getClarification().getId();
         userName = discussionEntry.getUser().getName();
         userId = discussionEntry.getUser().getId();
         message = discussionEntry.getMessage();

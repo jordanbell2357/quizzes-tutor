@@ -489,4 +489,6 @@ public class User implements UserDetails, DomainEntity {
     public void setClarifications(Set<Clarification> clarifications) {
         this.clarifications = clarifications;
     }
+
+    public void addClarification(Clarification clarification) { this.clarifications.add(clarification);}
 }

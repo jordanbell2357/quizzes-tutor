@@ -57,7 +57,4 @@ public class ClarificationController {
         return clarificationService.getAllClarifications(user.getKey());
     }
 
-
-
-
 }
