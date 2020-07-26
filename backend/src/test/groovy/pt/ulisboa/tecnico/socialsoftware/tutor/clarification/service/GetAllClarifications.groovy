@@ -7,19 +7,16 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.SpockTest
 import pt.ulisboa.tecnico.socialsoftware.tutor.answer.domain.QuestionAnswer
 import pt.ulisboa.tecnico.socialsoftware.tutor.answer.domain.QuizAnswer
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.domain.Clarification
-import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.domain.DiscussionEntry
-import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.dto.DiscussionEntryDto
+import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.dto.ClarificationDto
 import pt.ulisboa.tecnico.socialsoftware.tutor.config.DateHandler
-import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Question
 import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.domain.Quiz
 import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.domain.QuizQuestion
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User
 
-import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.DISCUSSION_ENTRY_TITLE_IS_EMPTY
 
 @DataJpaTest
-class AddDiscussionEntryTest extends SpockTest {
+class GetAllClarifications  extends SpockTest {
     def questionAnswer
     def user
     def quiz
@@ -56,55 +53,39 @@ class AddDiscussionEntryTest extends SpockTest {
         questionAnswer.setQuizQuestion(quizQuestion)
         questionAnswer.setQuizAnswer(quizAnswer)
         questionAnswerRepository.save(questionAnswer)
+    }
 
+    def 'A user with a clarification'() {
+        given: 'a clarification'
         def clarification = new Clarification()
-        clarification.setQuestionAnswer(questionAnswer)
+        clarification.setQuestionAnswer(questionAnswerRepository.findAll().get(0))
         clarification.setTitle(CLARIFICATION_1_TITLE)
-        clarification.setId(CLARIFICATION_1_ID)
-        clarification.setUser(user)
-        clarificationRepository.save(clarification)
-    }
-
-    def 'DiscussionEntry well done'(){
-        given: 'a DiscussionEntry'
-        def discussionEntryDto = new DiscussionEntryDto();
-        def clarification =  clarificationRepository.findAll().get(0)
-        discussionEntryDto.setClarificationId(clarification.getId())
-        discussionEntryDto.setId(DISCUSSION_ENTRY_1_ID)
-        discussionEntryDto.setMessage(DISCUSSION_1_MESSAGE)
         def user = userRepository.findAll().get(0)
-        discussionEntryDto.setUserId(user.getId())
+        clarification.setUser(user)
+        user.addClarification(clarification)
+        clarificationRepository.save(clarification)
 
         when:
-        def dE = clarificationService.addDiscussionEntry(clarification.getId(), discussionEntryDto)
+        ArrayList<ClarificationDto> clarificationList = clarificationService.getAllClarifications(user.getKey())
 
         then:
-        def discEnt = clarificationRepository.findAll().get(0).getDiscussionEntries()[0]
-        discEnt.getId() == DISCUSSION_ENTRY_1_ID
-        discEnt.getMessage() == DISCUSSION_1_MESSAGE
-        discEnt.getUser().getId() == user.getId()
-        dE.getId() == DISCUSSION_ENTRY_1_ID
-        dE.getMessage() == DISCUSSION_1_MESSAGE
-        dE.getUserId() == user.getId()
+        clarificationList.size() == 1
+        clarificationList.get(0).getTitle() == CLARIFICATION_1_TITLE
+        clarificationList.get(0).getId() == CLARIFICATION_1_ID
     }
 
-    def 'DiscussionEntry without a message'() {
-        given: 'a DiscussionEntry'
-        DiscussionEntry discussionEntry = new DiscussionEntry()
-        discussionEntry.setId(DISCUSSION_ENTRY_1_ID)
-        discussionEntry.setUser(userRepository.findAll().get(0))
-        def clarification = clarificationRepository.findAll().get(0)
-        discussionEntry.setClarification(clarification)
+    def 'A user without clarifications'() {
+        given: 'a user'
+        def user = userRepository.findAll().get(0)
 
         when:
-        clarificationService.addDiscussionEntry(clarification.getId(), new DiscussionEntryDto(discussionEntry))
+        ArrayList<ClarificationDto> clarificationList = clarificationService.getAllClarifications(user.getKey())
 
         then:
-        clarificationRepository.findAll().get(0).getDiscussionEntries().size() == 0
-        TutorException exception = thrown()
-        exception.getErrorMessage() == DISCUSSION_ENTRY_TITLE_IS_EMPTY
+        clarificationList.size() == 0
     }
-
-    @TestConfiguration
+    
+        @TestConfiguration
     static class LocalBeanConfiguration extends BeanConfiguration {}
+
 }
