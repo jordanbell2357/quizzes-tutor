@@ -59,6 +59,20 @@
           v-html="convertMarkDown(question.options[index].content)"
         />
       </li>
+      <v-card-actions>
+        <v-spacer />
+        <v-btn color="primary" depressed @click="newClarification">
+          Clarification
+        </v-btn>
+        <edit-clarification-dialog
+          v-if="currentClarification"
+          v-model="editClarificationDialog"
+          :answer="answer"
+          :clarification="currentClarification"
+          :question="question"
+          v-on:save-clarification="onSaveClarification"
+        />
+      </v-card-actions>
     </ul>
   </div>
 </template>
@@ -70,8 +84,14 @@ import StatementQuestion from '@/models/statement/StatementQuestion';
 import StatementAnswer from '@/models/statement/StatementAnswer';
 import StatementCorrectAnswer from '@/models/statement/StatementCorrectAnswer';
 import Image from '@/models/management/Image';
+import Clarification from '@/models/management/Clarification';
+import EditClarificationDialog from '@/views/student/quiz/editClarificationDialog.vue';
 
-@Component
+@Component({
+  components: {
+    'edit-clarification-dialog': EditClarificationDialog
+  }
+})
 export default class ResultComponent extends Vue {
   @Model('questionOrder', Number) questionOrder: number | undefined;
   @Prop(StatementQuestion) readonly question!: StatementQuestion;
@@ -79,6 +99,9 @@ export default class ResultComponent extends Vue {
   @Prop(StatementAnswer) readonly answer!: StatementAnswer;
   @Prop() readonly questionNumber!: number;
   hover: boolean = false;
+  editClarificationDialog: boolean = false;
+  currentClarification: Clarification | null = null;
+  clarification: Clarification | null = null;
   optionLetters: string[] = ['A', 'B', 'C', 'D'];
 
   @Emit()
@@ -93,6 +116,17 @@ export default class ResultComponent extends Vue {
 
   convertMarkDown(text: string, image: Image | null = null): string {
     return convertMarkDown(text, image);
+  }
+
+  newClarification() {
+    this.currentClarification = new Clarification();
+    this.editClarificationDialog = true;
+  }
+
+  async onSaveClarification() {
+    this.editClarificationDialog = false;
+    this.clarification = this.currentClarification;
+    this.currentClarification = null;
   }
 }
 </script>
