@@ -35,7 +35,7 @@ public class ClarificationController {
     @PostMapping("/clarification/{clarificationId}/add")
     @PreAuthorize("hasRole('ROLE_TEACHER') or (hasRole('ROLE_STUDENT') and hasPermission(#clarificationId, 'CLARIFICATION.ACCESS'))")
     public DiscussionEntryDto addDiscussionEntry(@Valid @RequestBody DiscussionEntryDto discussionEntryDto, @PathVariable Integer clarificationId) {
-        return clarificationService.addDiscussionEntry(clarificationId, discussionEntryDto);
+        return clarificationService.addDiscussionEntry(clarificationId, discussionEntryDto, false, discussionEntryDto.getUserId());
     }
 
     @GetMapping("/clarification/{clarificationId}/get")

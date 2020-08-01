@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 public class ClarificationDto {
     private Integer questionAnswerId;
     private String title;
+    private String question;
     private Integer id;
     private ArrayList<DiscussionEntryDto> discussionEntryDtoList;
 
@@ -20,6 +21,7 @@ public class ClarificationDto {
         questionAnswerId = clarification.getQuestionAnswer().getId();
         title = clarification.getTitle();
         id = clarification.getId();
+        question = clarification.getQuestionAnswer().getQuizQuestion().getQuestion().getTitle();
         discussionEntryDtoList = (ArrayList<DiscussionEntryDto>) clarification.getDiscussionEntries().stream().map(DiscussionEntryDto::new).collect(Collectors.toList());
     }
 
@@ -58,4 +60,13 @@ public class ClarificationDto {
     public void addDiscussionEntryDto(DiscussionEntryDto discussionEntryDto) {
         this.discussionEntryDtoList.add(discussionEntryDto);
     }
+
+    public String getQuestion() {
+        return question;
+    }
+
+    public void setQuestion(String question) {
+        this.question = question;
+    }
+
 }
