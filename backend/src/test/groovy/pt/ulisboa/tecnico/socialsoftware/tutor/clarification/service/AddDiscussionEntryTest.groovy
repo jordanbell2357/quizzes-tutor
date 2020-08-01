@@ -76,7 +76,7 @@ class AddDiscussionEntryTest extends SpockTest {
         discussionEntryDto.setUserId(user.getId())
 
         when:
-        def dE = clarificationService.addDiscussionEntry(clarification.getId(), discussionEntryDto)
+        def dE = clarificationService.addDiscussionEntry(clarification.getId(), discussionEntryDto, false, userRepository.findAll().get(0).getId())
 
         then:
         def discEnt = clarificationRepository.findAll().get(0).getDiscussionEntries()[0]
@@ -97,7 +97,7 @@ class AddDiscussionEntryTest extends SpockTest {
         discussionEntry.setClarification(clarification)
 
         when:
-        clarificationService.addDiscussionEntry(clarification.getId(), new DiscussionEntryDto(discussionEntry))
+        clarificationService.addDiscussionEntry(clarification.getId(), new DiscussionEntryDto(discussionEntry), false, userRepository.findAll().get(0).getId())
 
         then:
         clarificationRepository.findAll().get(0).getDiscussionEntries().size() == 0
