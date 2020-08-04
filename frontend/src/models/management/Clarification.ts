@@ -6,6 +6,7 @@ export default class Clarification {
   title: string = '';
   question: string = '';
   discussionEntryDtoList: Array<DiscussionEntry> = [];
+  username: string | null = null;
 
   constructor(jsonObj?: Clarification) {
     if (jsonObj) {
@@ -14,6 +15,7 @@ export default class Clarification {
       this.title = jsonObj.title;
       this.discussionEntryDtoList = jsonObj.discussionEntryDtoList;
       this.question = jsonObj.question;
+      this.username = jsonObj.username;
     }
   }
 }

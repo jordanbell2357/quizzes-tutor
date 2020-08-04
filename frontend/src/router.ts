@@ -25,6 +25,7 @@ import ImpExpView from '@/views/teacher/impexp/ImpExpView.vue';
 import AssessmentsView from '@/views/teacher/assessments/AssessmentsView.vue';
 import CreateQuizzesView from '@/views/student/CreateQuizzesView.vue';
 import CoursesView from '@/views/admin/Courses/CoursesView.vue';
+import ClarificationsView from '@/views/teacher/clarifications/ClarificationsView.vue';
 
 Vue.use(Router);
 
@@ -87,6 +88,15 @@ let router = new Router({
           component: QuizzesView,
           meta: {
             title: APP_NAME + ' - Quizzes',
+            requiredAuth: 'Teacher'
+          }
+        },
+        {
+          path: 'clarifications',
+          name: 'clarifications-management',
+          component: ClarificationsView,
+          meta: {
+            title: APP_NAME + ' - Clarifications',
             requiredAuth: 'Teacher'
           }
         },

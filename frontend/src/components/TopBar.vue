@@ -77,6 +77,14 @@
                 <v-list-item-title>Quizzes</v-list-item-title>
               </v-list-item-content>
             </v-list-item>
+            <v-list-item to="/management/clarifications">
+              <v-list-item-action>
+                <v-icon>comment</v-icon>
+              </v-list-item-action>
+              <v-list-item-content>
+                <v-list-item-title>Clarifications</v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
             <v-list-item to="/management/assessments">
               <v-list-item-action>
                 <v-icon>book</v-icon>
