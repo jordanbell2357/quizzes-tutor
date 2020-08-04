@@ -13,6 +13,7 @@ public class ClarificationDto {
     private String question;
     private Integer id;
     private ArrayList<DiscussionEntryDto> discussionEntryDtoList;
+    private String username;
 
     public ClarificationDto() {
     }
@@ -23,6 +24,7 @@ public class ClarificationDto {
         id = clarification.getId();
         question = clarification.getQuestionAnswer().getQuizQuestion().getQuestion().getTitle();
         discussionEntryDtoList = (ArrayList<DiscussionEntryDto>) clarification.getDiscussionEntries().stream().map(DiscussionEntryDto::new).collect(Collectors.toList());
+        username = clarification.getUser().getUsername();
     }
 
     public Integer getQuestionAnswerId() {
@@ -68,5 +70,14 @@ public class ClarificationDto {
     public void setQuestion(String question) {
         this.question = question;
     }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
 
 }

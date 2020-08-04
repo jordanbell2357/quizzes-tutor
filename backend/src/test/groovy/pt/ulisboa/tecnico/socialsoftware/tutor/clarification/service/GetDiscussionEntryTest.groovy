@@ -14,6 +14,8 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.domain.Quiz
 import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.domain.QuizQuestion
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User
 
+import java.sql.Timestamp
+
 @DataJpaTest
 class GetDiscussionEntryTest extends SpockTest {
     def questionAnswer
@@ -90,6 +92,48 @@ class GetDiscussionEntryTest extends SpockTest {
 
         then: 'it is empty'
         discussionEntries.size() == 0
+    }
+
+    def 'get two DiscussionEntries, ordered by timestamp' () {
+
+        given: 'a DiscussionEntry'
+        def clarification = clarificationRepository.findAll().get(0)
+
+        DiscussionEntry discussionEntry = new DiscussionEntry()
+        discussionEntry.setId(DISCUSSION_ENTRY_1_ID)
+        discussionEntry.setUser(userRepository.findAll().get(0))
+        discussionEntry.setTimestamp(new Timestamp(System.currentTimeMillis()));
+        discussionEntry.setClarification(clarification)
+        discussionEntry.setMessage(DISCUSSION_1_MESSAGE)
+        clarification.addDiscussionEntry(discussionEntry)
+        discussionEntry.setClarification(clarification)
+
+        Thread.sleep(100);
+
+        and: 'a DiscussionEntry'
+        DiscussionEntry discussionEntry1 = new DiscussionEntry()
+        discussionEntry1.setId(DISCUSSION_ENTRY_2_ID)
+        discussionEntry1.setUser(userRepository.findAll().get(0))
+        discussionEntry1.setTimestamp(new Timestamp(System.currentTimeMillis()));
+        discussionEntry1.setClarification(clarification)
+        discussionEntry1.setMessage(DISCUSSION_2_MESSAGE)
+        clarification.addDiscussionEntry(discussionEntry1)
+        discussionEntry1.setClarification(clarification)
+
+        when:
+        def discussionEntries = clarificationService.getDiscussionEntries(clarification.getId())
+
+        then:
+        discussionEntries.size() == 2
+        def disc = discussionEntries.get(0)
+        def disc1 = discussionEntries.get(1)
+        disc.getTimestamp() < disc1.getTimestamp()
+
+        disc.getId() == DISCUSSION_ENTRY_1_ID
+        disc.getMessage() == DISCUSSION_1_MESSAGE
+
+        disc1.getId() == DISCUSSION_ENTRY_2_ID
+        disc1.getMessage() == DISCUSSION_2_MESSAGE
     }
 
 
