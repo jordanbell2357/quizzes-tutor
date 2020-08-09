@@ -4,12 +4,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-import pt.ulisboa.tecnico.socialsoftware.tutor.TutorApplication;
-import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.domain.Clarification;
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.dto.ClarificationDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.dto.DiscussionEntryDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.repository.ClarificationRepository;
-import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
 
 import javax.validation.Valid;
@@ -32,6 +29,12 @@ public class ClarificationController {
         return clarificationService.newClarification(clarificationDto, user.getKey());
     }
 
+    @GetMapping("/clarifications/{executionId}/get")
+    @PreAuthorize("hasRole('ROLE_TEACHER') and hasPermission(#executionId, 'EXECUTION.ACCESS')")
+    public List<ClarificationDto> getAllClarifications(@PathVariable Integer executionId) {
+        return clarificationService.getAllClarifications(executionId);
+    }
+
     @PostMapping("/clarification/{clarificationId}/add")
     @PreAuthorize("hasRole('ROLE_TEACHER') or (hasRole('ROLE_STUDENT') and hasPermission(#clarificationId, 'CLARIFICATION.ACCESS'))")
     public DiscussionEntryDto addDiscussionEntry(@Valid @RequestBody DiscussionEntryDto discussionEntryDto, @PathVariable Integer clarificationId) {
@@ -52,9 +55,9 @@ public class ClarificationController {
 
     @GetMapping("/clarification/get")
     @PreAuthorize("hasRole('ROLE_STUDENT')")
-    public List<ClarificationDto> getAllClarifications(Principal principal) {
+    public List<ClarificationDto> getAllPersonalClarifications(Principal principal) {
         User user = (User) ((Authentication) principal).getPrincipal();
-        return clarificationService.getAllClarifications(user.getKey());
+        return clarificationService.getAllPersonalClarifications(user.getKey());
     }
 
 }

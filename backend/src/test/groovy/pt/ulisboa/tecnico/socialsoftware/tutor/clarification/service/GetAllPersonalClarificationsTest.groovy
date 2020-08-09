@@ -16,7 +16,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.user.User
 
 
 @DataJpaTest
-class GetAllClarifications  extends SpockTest {
+class GetAllPersonalClarificationsTest extends SpockTest {
     def questionAnswer
     def user
     def quiz
@@ -66,7 +66,7 @@ class GetAllClarifications  extends SpockTest {
         clarificationRepository.save(clarification)
 
         when:
-        ArrayList<ClarificationDto> clarificationList = clarificationService.getAllClarifications(user.getKey())
+        ArrayList<ClarificationDto> clarificationList = clarificationService.getAllPersonalClarifications(user.getKey())
 
         then:
         clarificationList.size() == 1
@@ -79,7 +79,7 @@ class GetAllClarifications  extends SpockTest {
         def user = userRepository.findAll().get(0)
 
         when:
-        ArrayList<ClarificationDto> clarificationList = clarificationService.getAllClarifications(user.getKey())
+        ArrayList<ClarificationDto> clarificationList = clarificationService.getAllPersonalClarifications(user.getKey())
 
         then:
         clarificationList.size() == 0

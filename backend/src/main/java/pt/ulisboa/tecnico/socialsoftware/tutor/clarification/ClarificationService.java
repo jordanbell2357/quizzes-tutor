@@ -17,6 +17,8 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.dto.DiscussionEntry
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.repository.ClarificationRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.repository.DiscussionEntryRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
+import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.domain.Quiz;
+import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.repository.QuizRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.statement.QuestionAnswerItemRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository;
@@ -25,9 +27,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.*;
@@ -50,6 +50,9 @@ public class ClarificationService {
 
     @Autowired
     private DiscussionEntryRepository discussionEntryRepository;
+
+    @Autowired
+    private QuizRepository quizRepository;
 
     @Retryable(
             value = {SQLException.class},
@@ -117,7 +120,7 @@ public class ClarificationService {
             backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.READ_COMMITTED)
     public ClarificationDto newClarification(ClarificationDto clarificationDto, int userKey) {
-        if (clarificationDto.getDiscussionEntryDtoList()!= null) {
+        if (clarificationDto.getDiscussionEntryDtoList() != null) {
             if (!clarificationDto.getDiscussionEntryDtoList().isEmpty()) {
                 User user = userRepository.findByKey(userKey).orElseThrow(() -> new TutorException(USER_NOT_FOUND, userKey));
                 ClarificationDto clarificationDto1 = this.createClarification(clarificationDto.getQuestionAnswerId(), clarificationDto, user);
@@ -142,11 +145,28 @@ public class ClarificationService {
             value = {SQLException.class},
             backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.READ_COMMITTED)
-    public List<ClarificationDto> getAllClarifications(Integer key) {
+    public List<ClarificationDto> getAllPersonalClarifications(Integer key) {
         User user = userRepository.findByKey(key).orElseThrow(() -> new TutorException(USER_NOT_FOUND, key));
         return user.getClarifications().stream()
                 .sorted(Comparator.comparing(Clarification::getTitle))
                 .map(ClarificationDto::new)
                 .collect(Collectors.toList());
+    }
+
+    @Retryable(
+            value = {SQLException.class},
+            backoff = @Backoff(delay = 5000))
+    @Transactional(isolation = Isolation.READ_COMMITTED)
+    public List<ClarificationDto> getAllClarifications(int executionId) {
+        {
+            List<Quiz> quizzes = new ArrayList<>(quizRepository.findQuizzesOfExecution(executionId));
+            List<QuizAnswer> qAnswers = quizzes.stream().flatMap(quiz -> quiz.getQuizAnswers().stream()).collect(Collectors.toList());
+            Set<QuestionAnswer> questionAnswers = qAnswers.stream().flatMap(quizAnswer -> quizAnswer.getQuestionAnswers().stream()).collect(Collectors.toSet());
+            Set<Clarification> cA = questionAnswers.stream().flatMap(questionAnswer -> questionAnswer.getClarifications().stream()).collect(Collectors.toSet());
+            return cA.stream()
+                    .sorted(Comparator.comparing(Clarification::getTitle))
+                    .map(ClarificationDto::new)
+                    .collect(Collectors.toList());
+        }
     }
 }
