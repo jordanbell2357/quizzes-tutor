@@ -7,6 +7,7 @@ export default class Clarification {
   question: string = '';
   discussionEntryDtoList: Array<DiscussionEntry> = [];
   username: string | null = null;
+  lastDiscussionEntry: string | undefined = '';
 
   constructor(jsonObj?: Clarification) {
     if (jsonObj) {
@@ -16,6 +17,7 @@ export default class Clarification {
       this.discussionEntryDtoList = jsonObj.discussionEntryDtoList;
       this.question = jsonObj.question;
       this.username = jsonObj.username;
+      this.lastDiscussionEntry = jsonObj.discussionEntryDtoList.pop()?.message;
     }
   }
 }

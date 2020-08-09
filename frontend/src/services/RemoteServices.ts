@@ -156,11 +156,25 @@ export default class RemoteServices {
   static async createClarification(
     clarification: Clarification
   ): Promise<Clarification> {
-    console.log(clarification);
     return httpClient
       .post('/clarification/create', clarification)
       .then(response => {
         return new Clarification(response.data);
+      })
+      .catch(async error => {
+        throw Error(await this.errorMessage(error));
+      });
+  }
+
+  static async getAllClarifications(): Promise<Clarification[]> {
+    return httpClient
+      .get(
+        `/clarifications/${Store.getters.getCurrentCourse.courseExecutionId}/get`
+      )
+      .then(response => {
+        return response.data.map((clarification: any) => {
+          return new Clarification(clarification);
+        });
       })
       .catch(async error => {
         throw Error(await this.errorMessage(error));
