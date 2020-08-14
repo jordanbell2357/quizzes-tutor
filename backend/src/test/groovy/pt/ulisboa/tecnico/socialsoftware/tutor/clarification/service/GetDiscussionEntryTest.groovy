@@ -15,6 +15,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.domain.QuizQuestion
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User
 
 import java.sql.Timestamp
+import java.time.LocalDateTime
 
 @DataJpaTest
 class GetDiscussionEntryTest extends SpockTest {
@@ -94,7 +95,7 @@ class GetDiscussionEntryTest extends SpockTest {
         discussionEntries.size() == 0
     }
 
-    def 'get two DiscussionEntries, ordered by timestamp' () {
+    def 'get two DiscussionEntries, ordered by dateTime' () {
 
         given: 'a DiscussionEntry'
         def clarification = clarificationRepository.findAll().get(0)
@@ -102,7 +103,7 @@ class GetDiscussionEntryTest extends SpockTest {
         DiscussionEntry discussionEntry = new DiscussionEntry()
         discussionEntry.setId(DISCUSSION_ENTRY_1_ID)
         discussionEntry.setUser(userRepository.findAll().get(0))
-        discussionEntry.setTimestamp(new Timestamp(System.currentTimeMillis()));
+        discussionEntry.setLocalDateTime(LocalDateTime.now())
         discussionEntry.setClarification(clarification)
         discussionEntry.setMessage(DISCUSSION_1_MESSAGE)
         clarification.addDiscussionEntry(discussionEntry)
@@ -114,7 +115,7 @@ class GetDiscussionEntryTest extends SpockTest {
         DiscussionEntry discussionEntry1 = new DiscussionEntry()
         discussionEntry1.setId(DISCUSSION_ENTRY_2_ID)
         discussionEntry1.setUser(userRepository.findAll().get(0))
-        discussionEntry1.setTimestamp(new Timestamp(System.currentTimeMillis()));
+        discussionEntry1.setLocalDateTime(LocalDateTime.now())
         discussionEntry1.setClarification(clarification)
         discussionEntry1.setMessage(DISCUSSION_2_MESSAGE)
         clarification.addDiscussionEntry(discussionEntry1)
@@ -127,7 +128,7 @@ class GetDiscussionEntryTest extends SpockTest {
         discussionEntries.size() == 2
         def disc = discussionEntries.get(0)
         def disc1 = discussionEntries.get(1)
-        disc.getTimestamp() < disc1.getTimestamp()
+        disc.getDateTime() < disc1.getDateTime()
 
         disc.getId() == DISCUSSION_ENTRY_1_ID
         disc.getMessage() == DISCUSSION_1_MESSAGE
