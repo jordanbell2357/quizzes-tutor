@@ -2,8 +2,8 @@ package pt.ulisboa.tecnico.socialsoftware.tutor.clarification.dto;
 
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.domain.DiscussionEntry;
 import pt.ulisboa.tecnico.socialsoftware.tutor.config.DateHandler;
-
 import java.util.Date;
+
 
 public class DiscussionEntryDto {
     private Integer clarificationId;

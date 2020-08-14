@@ -36,7 +36,11 @@
               book
             </v-icon>
           </template>
+<<<<<<< HEAD
           <span>View Discussion</span>
+=======
+          <span>Add Entry</span>
+>>>>>>> clarification
         </v-tooltip>
       </template>
     </v-data-table>
@@ -72,7 +76,11 @@ export default class ClarificationsView extends Vue {
     { text: 'Question', value: 'question', align: 'left' },
     { text: 'User', value: 'username', align: 'left' },
     { text: 'Last Entry', value: 'lastDiscussionEntry', align: 'left' },
+<<<<<<< HEAD
     { text: 'Time', value: 'timeOfLastEntry', align: 'left' },
+=======
+    { text: 'Time', value: 'timestamp', align: 'left' },
+>>>>>>> clarification
     {
       text: 'Action',
       value: 'action',

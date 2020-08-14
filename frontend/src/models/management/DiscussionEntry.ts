@@ -5,7 +5,11 @@ export default class DiscussionEntry {
   clarificationId: number | null = null;
   message: string = '';
   userId: number | null = null;
+<<<<<<< HEAD
   dateTime: string = '';
+=======
+  dateTime: number = Date.now();
+>>>>>>> clarification
   username: string = '';
 
   constructor(jsonObj?: DiscussionEntry) {
@@ -14,7 +18,11 @@ export default class DiscussionEntry {
       this.clarificationId = jsonObj.clarificationId;
       this.message = jsonObj.message;
       this.userId = jsonObj.userId;
+<<<<<<< HEAD
       this.dateTime = ISOtoString(jsonObj.dateTime);
+=======
+      this.dateTime = new Date(jsonObj.dateTime);
+>>>>>>> clarification
       this.username = jsonObj.username;
     }
   }
