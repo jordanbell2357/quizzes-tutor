@@ -2,7 +2,7 @@ package pt.ulisboa.tecnico.socialsoftware.tutor.clarification.dto;
 
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.domain.DiscussionEntry;
 
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 public class DiscussionEntryDto {
 
@@ -14,7 +14,7 @@ public class DiscussionEntryDto {
 
     private String message;
 
-    private Timestamp timestamp;
+    private LocalDateTime dateTime;
 
     private Integer id;
 
@@ -24,7 +24,7 @@ public class DiscussionEntryDto {
         userName = discussionEntry.getUser().getName();
         userId = discussionEntry.getUser().getId();
         message = discussionEntry.getMessage();
-        timestamp = discussionEntry.getTimestamp();
+        dateTime = discussionEntry.getLocalDateTime();
         id = discussionEntry.getId();
     }
 
@@ -55,12 +55,12 @@ public class DiscussionEntryDto {
         this.message = message;
     }
 
-    public Timestamp getTimestamp() {
-        return timestamp;
+    public LocalDateTime getDateTime() {
+        return dateTime;
     }
 
-    public void setTimestamp(Timestamp timestamp) {
-        this.timestamp = timestamp;
+    public void setDateTime(LocalDateTime dateTime) {
+        this.dateTime = dateTime;
     }
 
     public Integer getUserId() {

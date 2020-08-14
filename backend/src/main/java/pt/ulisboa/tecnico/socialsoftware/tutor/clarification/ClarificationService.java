@@ -1,6 +1,5 @@
 package pt.ulisboa.tecnico.socialsoftware.tutor.clarification;
 
-import io.swagger.models.auth.In;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
@@ -19,14 +18,12 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.repository.Discussi
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
 import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.domain.Quiz;
 import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.repository.QuizRepository;
-import pt.ulisboa.tecnico.socialsoftware.tutor.statement.QuestionAnswerItemRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -112,7 +109,7 @@ public class ClarificationService {
     @Transactional(isolation = Isolation.READ_COMMITTED)
     public List<DiscussionEntryDto> getDiscussionEntries(Integer clarificationId) {
         Clarification clarification = clarificationRepository.findById(clarificationId).orElseThrow(() -> new TutorException(CLARIFICATION_NOT_FOUND, clarificationId));
-        return clarification.getDiscussionEntries().stream().sorted(Comparator.comparing(DiscussionEntry::getTimestamp)).map(DiscussionEntryDto::new).collect(Collectors.toList());
+        return clarification.getDiscussionEntries().stream().sorted(Comparator.comparing(DiscussionEntry::getLocalDateTime)).map(DiscussionEntryDto::new).collect(Collectors.toList());
     }
 
     @Retryable(

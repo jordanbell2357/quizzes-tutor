@@ -8,7 +8,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.impexp.domain.Visitor;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
 
 import javax.persistence.*;
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "discussion_entries")
@@ -25,7 +25,7 @@ public class DiscussionEntry implements DomainEntity {
     @JoinColumn(name = "user_id")
     private User user;
 
-    private Timestamp timestamp;
+    private LocalDateTime localDateTime;
 
     private String message;
 
@@ -35,7 +35,7 @@ public class DiscussionEntry implements DomainEntity {
     public DiscussionEntry(DiscussionEntryDto discussionEntryDto, Clarification clarification, User user) {
         this.clarification = clarification;
         this.user = user;
-        this.timestamp = new Timestamp(System.currentTimeMillis());
+        this.localDateTime = discussionEntryDto.getDateTime();
         this.id = discussionEntryDto.getId();
         if (discussionEntryDto.getMessage() != null) {
             if (!discussionEntryDto.getMessage().isEmpty()) {
@@ -76,12 +76,12 @@ public class DiscussionEntry implements DomainEntity {
         this.message = message;
     }
 
-    public Timestamp getTimestamp() {
-        return timestamp;
+    public LocalDateTime getLocalDateTime() {
+        return localDateTime;
     }
 
-    public void setTimestamp(Timestamp timestamp) {
-        this.timestamp = timestamp;
+    public void setLocalDateTime(LocalDateTime localDateTime) {
+        this.localDateTime = localDateTime;
     }
 
     public Integer getId() {
