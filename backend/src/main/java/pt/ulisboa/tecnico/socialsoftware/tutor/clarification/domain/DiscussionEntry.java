@@ -1,6 +1,7 @@
 package pt.ulisboa.tecnico.socialsoftware.tutor.clarification.domain;
 
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.dto.DiscussionEntryDto;
+import pt.ulisboa.tecnico.socialsoftware.tutor.config.DateHandler;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
 import pt.ulisboa.tecnico.socialsoftware.tutor.impexp.domain.DomainEntity;
@@ -17,11 +18,11 @@ public class DiscussionEntry implements DomainEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @ManyToOne(fetch=FetchType.EAGER, optional=false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "clarification_id")
     private Clarification clarification;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional=false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id")
     private User user;
 
@@ -35,15 +36,13 @@ public class DiscussionEntry implements DomainEntity {
     public DiscussionEntry(DiscussionEntryDto discussionEntryDto, Clarification clarification, User user) {
         this.clarification = clarification;
         this.user = user;
-        this.localDateTime = discussionEntryDto.getDateTime();
+        this.localDateTime = DateHandler.now();
         this.id = discussionEntryDto.getId();
         if (discussionEntryDto.getMessage() != null) {
             if (!discussionEntryDto.getMessage().isEmpty()) {
                 this.message = discussionEntryDto.getMessage();
-            }
-            else throw new TutorException(ErrorMessage.DISCUSSION_ENTRY_TITLE_IS_EMPTY);
-        }
-        else throw new TutorException(ErrorMessage.DISCUSSION_ENTRY_TITLE_IS_EMPTY);
+            } else throw new TutorException(ErrorMessage.DISCUSSION_ENTRY_TITLE_IS_EMPTY);
+        } else throw new TutorException(ErrorMessage.DISCUSSION_ENTRY_TITLE_IS_EMPTY);
 
     }
 

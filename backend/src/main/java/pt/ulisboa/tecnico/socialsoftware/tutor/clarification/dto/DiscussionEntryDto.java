@@ -1,30 +1,24 @@
 package pt.ulisboa.tecnico.socialsoftware.tutor.clarification.dto;
 
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.domain.DiscussionEntry;
+import pt.ulisboa.tecnico.socialsoftware.tutor.config.DateHandler;
 
-import java.time.LocalDateTime;
+import java.util.Date;
 
 public class DiscussionEntryDto {
-
     private Integer clarificationId;
-
     private String userName;
-
     private Integer userId;
-
     private String message;
-
-    private LocalDateTime dateTime;
-
+    private String dateTime;
     private Integer id;
-
 
     public DiscussionEntryDto(DiscussionEntry discussionEntry) {
         clarificationId = discussionEntry.getClarification().getId();
         userName = discussionEntry.getUser().getName();
         userId = discussionEntry.getUser().getId();
         message = discussionEntry.getMessage();
-        dateTime = discussionEntry.getLocalDateTime();
+        dateTime = DateHandler.toISOString(discussionEntry.getLocalDateTime());
         id = discussionEntry.getId();
     }
 
@@ -55,11 +49,11 @@ public class DiscussionEntryDto {
         this.message = message;
     }
 
-    public LocalDateTime getDateTime() {
+    public String getDateTime() {
         return dateTime;
     }
 
-    public void setDateTime(LocalDateTime dateTime) {
+    public void setDateTime(String dateTime) {
         this.dateTime = dateTime;
     }
 
