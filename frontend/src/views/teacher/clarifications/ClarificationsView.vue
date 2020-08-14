@@ -18,28 +18,29 @@
             label="Search"
             class="mx-2"
           />
-
-          <template v-slot:item.action="{ item }">
-            <v-tooltip bottom>
-              <template v-slot:activator="{ on }">
-                <v-icon class="mr-2" v-on="on" @click="addDiscussion(item)"
-                  >add_box</v-icon
-                >
-              </template>
-              <span>Add Answer</span>
-            </v-tooltip>
-            <v-tooltip bottom>
-              <template v-slot:activator="{ on }">
-                <v-icon class="mr-2" v-on="on" @click="viewDiscussion(item)">
-                  book
-                </v-icon>
-              </template>
-              <span>Add Entry</span>
-            </v-tooltip>
-          </template>
         </v-card-title>
       </template>
+
+      <template v-slot:item.action="{ item }">
+        <v-tooltip bottom>
+          <template v-slot:activator="{ on }">
+            <v-icon class="mr-2" v-on="on" @click="addDiscussion(item)"
+              >add_box</v-icon
+            >
+          </template>
+          <span>Add Answer</span>
+        </v-tooltip>
+        <v-tooltip bottom>
+          <template v-slot:activator="{ on }">
+            <v-icon class="mr-2" v-on="on" @click="viewDiscussion(item)">
+              book
+            </v-icon>
+          </template>
+          <span>Add Entry</span>
+        </v-tooltip>
+      </template>
     </v-data-table>
+
     <show-discussion-dialog
       v-if="currentDiscussionEntry"
       v-model="discussionEntryDialog"
