@@ -14,6 +14,7 @@ import AuthDto from '@/models/user/AuthDto';
 import StatementAnswer from '@/models/statement/StatementAnswer';
 import { QuizAnswers } from '@/models/management/QuizAnswers';
 import Clarification from '@/models/management/Clarification';
+import DiscussionEntry from '@/models/management/DiscussionEntry';
 
 const httpClient = axios.create();
 httpClient.defaults.timeout = 100000;
@@ -178,6 +179,18 @@ export default class RemoteServices {
       })
       .catch(async error => {
         throw Error(await this.errorMessage(error));
+      });
+  }
+
+  static async getClarificationById(
+    clarificationId: number | null
+  ): Promise<Clarification> {
+    return httpClient
+      .get(`/clarifications/${clarificationId}/get`)
+      .then(response => {
+        return response.data.map((clarification: Clarification) => {
+          return new Clarification(clarification);
+        });
       });
   }
 

@@ -7,7 +7,8 @@
       disable-pagination
       :hide-default-footer="true"
       :mobile-breakpoint="0"
-      multi-sort
+      :items-per-page="15"
+      :footer-props="{ itemsPerPageOptions: [15, 30, 50, 100] }"
     >
       <template v-slot:top>
         <v-card-title>
@@ -17,14 +18,11 @@
             label="Search"
             class="mx-2"
           />
+
           <template v-slot:item.action="{ item }">
             <v-tooltip bottom>
               <template v-slot:activator="{ on }">
-                <v-icon
-                  small
-                  class="mr-2"
-                  v-on="on"
-                  @click="addDiscussion(item)"
+                <v-icon class="mr-2" v-on="on" @click="addDiscussion(item)"
                   >add_box</v-icon
                 >
               </template>
@@ -32,29 +30,32 @@
             </v-tooltip>
             <v-tooltip bottom>
               <template v-slot:activator="{ on }">
-                <v-icon
-                  small
-                  class="mr-2"
-                  v-on="on"
-                  @click="viewDiscussion(item)"
-                  color="white"
-                  >book
+                <v-icon class="mr-2" v-on="on" @click="viewDiscussion(item)">
+                  book
                 </v-icon>
               </template>
-              <span>Thread</span>
+              <span>Add Entry</span>
             </v-tooltip>
           </template>
         </v-card-title>
       </template>
     </v-data-table>
+    <show-discussion-dialog
+      v-if="currentDiscussionEntry"
+      v-model="discussionEntryDialog"
+      :discussionEntry="currentDiscussionEntry"
+      v-on:close-show-question-dialog="onCloseDiscussionEntryDialog"
+    />
   </v-card>
 </template>
+
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator';
 import Clarification from '@/models/management/Clarification';
 import RemoteServices from '@/services/RemoteServices';
 import editClarificationDialog from '@/views/student/quiz/editClarificationDialog.vue';
 import DiscussionEntry from '@/models/management/DiscussionEntry';
+import StatementClarification from '@/models/statement/StatementClarification';
 
 @Component({
   components: {
@@ -69,10 +70,20 @@ export default class ClarificationsView extends Vue {
     { text: 'Title', value: 'title', align: 'center', width: '10%' },
     { text: 'Question', value: 'question', align: 'left' },
     { text: 'User', value: 'username', align: 'left' },
-    { text: 'Last Entry', value: 'lastDiscussionEntry', align: 'left' }
+    { text: 'Last Entry', value: 'lastDiscussionEntry', align: 'left' },
+    { text: 'Time', value: 'timestamp', align: 'left' },
+    {
+      text: 'Action',
+      value: 'action',
+      align: 'left',
+      width: '5px',
+      sortable: false
+    }
   ];
+
   currentDiscussionEntry: DiscussionEntry | undefined;
   editDiscussionEntryDialog: boolean = false;
+  discussionEntryDialog: boolean = false;
 
   async created() {
     try {
@@ -87,6 +98,19 @@ export default class ClarificationsView extends Vue {
     this.currentDiscussionEntry = new DiscussionEntry();
     this.currentDiscussionEntry.clarificationId = clarification.id;
     this.editDiscussionEntryDialog = true;
+  }
+
+  async viewDiscussion(clarification: Clarification) {
+    let statementManager: StatementClarification =
+      StatementClarification.getInstance;
+    statementManager.clarification = clarification;
+    statementManager.discussionEntries = clarification.discussionEntryDtoList;
+    await this.$router.push({ name: 'clarification-discussion-view' });
+  }
+
+  async onCloseDiscussionEntryDialog() {
+    this.currentDiscussionEntry = undefined;
+    this.discussionEntryDialog = false;
   }
 }
 </script>
