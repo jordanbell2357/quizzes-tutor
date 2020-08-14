@@ -3,7 +3,7 @@ export default class DiscussionEntry {
   clarificationId: number | null = null;
   message: string = '';
   userId: number | null = null;
-  timestamp: Date = new Date();
+  dateTime: number = Date.now();
   username: string = '';
 
   constructor(jsonObj?: DiscussionEntry) {
@@ -12,7 +12,7 @@ export default class DiscussionEntry {
       this.clarificationId = jsonObj.clarificationId;
       this.message = jsonObj.message;
       this.userId = jsonObj.userId;
-      this.timestamp = new Date(jsonObj.timestamp);
+      this.dateTime = new Date(jsonObj.dateTime);
       this.username = jsonObj.username;
     }
   }
