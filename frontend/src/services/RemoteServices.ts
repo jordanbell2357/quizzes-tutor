@@ -157,6 +157,7 @@ export default class RemoteServices {
   static async createClarification(
     clarification: Clarification
   ): Promise<Clarification> {
+    console.log(clarification);
     return httpClient
       .post('/clarification/create', clarification)
       .then(response => {

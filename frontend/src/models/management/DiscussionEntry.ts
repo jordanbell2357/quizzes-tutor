@@ -1,9 +1,11 @@
+import { ISOtoString } from '@/services/ConvertDateService';
+
 export default class DiscussionEntry {
   id: number | null = null;
   clarificationId: number | null = null;
   message: string = '';
   userId: number | null = null;
-  dateTime: number = Date.now();
+  dateTime: string = '';
   username: string = '';
 
   constructor(jsonObj?: DiscussionEntry) {
@@ -12,7 +14,7 @@ export default class DiscussionEntry {
       this.clarificationId = jsonObj.clarificationId;
       this.message = jsonObj.message;
       this.userId = jsonObj.userId;
-      this.dateTime = new Date(jsonObj.dateTime);
+      this.dateTime = ISOtoString(jsonObj.dateTime);
       this.username = jsonObj.username;
     }
   }

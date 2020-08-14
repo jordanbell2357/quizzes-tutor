@@ -1,4 +1,5 @@
 import DiscussionEntry from '@/models/management/DiscussionEntry';
+import { ISOtoString } from '@/services/ConvertDateService';
 
 export default class Clarification {
   id: number | null = null;
@@ -8,6 +9,7 @@ export default class Clarification {
   discussionEntryDtoList: Array<DiscussionEntry> = [];
   username: string | null = null;
   lastDiscussionEntry: string | undefined = '';
+  timeOfLastEntry: string | undefined = '';
 
   constructor(jsonObj?: Clarification) {
     if (jsonObj) {
@@ -17,7 +19,10 @@ export default class Clarification {
       this.discussionEntryDtoList = jsonObj.discussionEntryDtoList;
       this.question = jsonObj.question;
       this.username = jsonObj.username;
-      this.lastDiscussionEntry = jsonObj.discussionEntryDtoList.pop()?.message;
+      this.lastDiscussionEntry = jsonObj.discussionEntryDtoList[0].message;
+      this.timeOfLastEntry = ISOtoString(
+        jsonObj.discussionEntryDtoList[0].dateTime
+      );
     }
   }
 }

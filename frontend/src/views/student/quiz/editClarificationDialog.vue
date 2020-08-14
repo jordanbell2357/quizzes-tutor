@@ -43,7 +43,6 @@ import { Component, Model, Prop, Vue } from 'vue-property-decorator';
 import RemoteServices from '@/services/RemoteServices';
 import Clarification from '@/models/management/Clarification';
 import StatementAnswer from '@/models/statement/StatementAnswer';
-import { QuestionAnswer } from '@/models/management/QuestionAnswer';
 import DiscussionEntry from '@/models/management/DiscussionEntry';
 import StatementQuestion from '@/models/statement/StatementQuestion';
 
@@ -59,7 +58,9 @@ export default class EditClarificationDialog extends Vue {
 
   created() {
     this.editClarification = new Clarification(this.clarification);
-    this.editClarification.discussionEntryDtoList = new Array<DiscussionEntry>();
+    this.editClarification.discussionEntryDtoList = new Array<
+      DiscussionEntry
+    >();
   }
 
   async saveClarification() {
@@ -73,7 +74,9 @@ export default class EditClarificationDialog extends Vue {
         this.editClarification.question = this.question.content;
         this.discussionEntry = new DiscussionEntry();
         this.discussionEntry.message = this.editClarification.title;
-        this.editClarification.discussionEntryDtoList.push(this.discussionEntry);
+        this.editClarification.discussionEntryDtoList.push(
+          this.discussionEntry
+        );
 
         const result = await RemoteServices.createClarification(
           this.editClarification
