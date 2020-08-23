@@ -157,7 +157,6 @@ export default class RemoteServices {
   static async createClarification(
     clarification: Clarification
   ): Promise<Clarification> {
-    console.log(clarification);
     return httpClient
       .post('/clarification/create', clarification)
       .then(response => {
@@ -192,6 +191,20 @@ export default class RemoteServices {
         return response.data.map((clarification: Clarification) => {
           return new Clarification(clarification);
         });
+      });
+  }
+
+  static async addDiscussionEntryToClarification(
+    clarificationId: number | null,
+    discussionEntry: DiscussionEntry
+  ): Promise<DiscussionEntry> {
+    return httpClient
+      .post(`/clarification/${clarificationId}/add`, discussionEntry)
+      .then(response => {
+        return new DiscussionEntry(response.data);
+      })
+      .catch(async error => {
+        throw Error(await this.errorMessage(error));
       });
   }
 

@@ -85,7 +85,7 @@ import StatementAnswer from '@/models/statement/StatementAnswer';
 import StatementCorrectAnswer from '@/models/statement/StatementCorrectAnswer';
 import Image from '@/models/management/Image';
 import Clarification from '@/models/management/Clarification';
-import EditClarificationDialog from '@/views/student/quiz/editClarificationDialog.vue';
+import EditClarificationDialog from '@/views/student/quiz/EditClarificationDialog.vue';
 
 @Component({
   components: {

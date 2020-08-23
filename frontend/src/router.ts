@@ -101,6 +101,15 @@ let router = new Router({
           }
         },
         {
+          path: 'clarification/discussion',
+          name: 'clarification-discussion-view',
+          component: QuestionsView,
+          meta: {
+            title: APP_NAME + ' - Clarification Discussion',
+            requiredAuth: 'Teacher'
+          }
+        },
+        {
           path: 'assessments',
           name: 'assessments-management',
           component: AssessmentsView,

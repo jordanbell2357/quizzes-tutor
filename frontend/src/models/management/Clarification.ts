@@ -19,9 +19,14 @@ export default class Clarification {
       this.discussionEntryDtoList = jsonObj.discussionEntryDtoList;
       this.question = jsonObj.question;
       this.username = jsonObj.username;
-      this.lastDiscussionEntry = jsonObj.discussionEntryDtoList[0].message;
+      this.lastDiscussionEntry =
+        jsonObj.discussionEntryDtoList[
+          jsonObj.discussionEntryDtoList.length - 1
+        ].message;
       this.timeOfLastEntry = ISOtoString(
-        jsonObj.discussionEntryDtoList[0].dateTime
+        jsonObj.discussionEntryDtoList[
+          jsonObj.discussionEntryDtoList.length - 1
+        ].dateTime
       );
     }
   }

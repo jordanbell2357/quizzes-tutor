@@ -10,18 +10,18 @@
       <v-card-title>
         <span class="headline">
           {{
-            editClarification && editClarification.id === null
-              ? 'New ClarificationRequest'
-              : 'Edit ClarificationRequest'
+            clarification && clarification.id === null
+              ? 'New Clarification'
+              : 'Edit Clarification'
           }}
         </span>
       </v-card-title>
 
-      <v-card-text class="text-left" v-if="editClarification">
+      <v-card-text class="text-left" v-if="clarification">
         <v-container grid-list-md fluid>
           <v-layout column wrap>
             <v-flex xs24 sm12 md8>
-              <v-text-field v-model="editClarification.title" label="Message" />
+              <v-text-field v-model="clarification.title" label="Message" />
             </v-flex>
           </v-layout>
         </v-container>
@@ -53,33 +53,23 @@ export default class EditClarificationDialog extends Vue {
   readonly clarification!: Clarification;
   @Prop(StatementAnswer) readonly answer!: StatementAnswer;
   @Prop(StatementQuestion) readonly question!: StatementQuestion;
-  editClarification!: Clarification;
   discussionEntry!: DiscussionEntry;
 
-  created() {
-    this.editClarification = new Clarification(this.clarification);
-    this.editClarification.discussionEntryDtoList = new Array<
-      DiscussionEntry
-    >();
-  }
-
   async saveClarification() {
-    if (this.editClarification && !this.editClarification.title) {
+    if (this.clarification && !this.clarification.title) {
       await this.$store.dispatch('error', 'Clarification must have a message');
       return;
     }
-    if (this.editClarification) {
+    if (this.clarification) {
       try {
-        this.editClarification.questionAnswerId = this.answer.questionAnswerId;
-        this.editClarification.question = this.question.content;
+        this.clarification.questionAnswerId = this.answer.questionAnswerId;
+        this.clarification.question = this.question.content;
         this.discussionEntry = new DiscussionEntry();
-        this.discussionEntry.message = this.editClarification.title;
-        this.editClarification.discussionEntryDtoList.push(
-          this.discussionEntry
-        );
+        this.discussionEntry.message = this.clarification.title;
+        this.clarification.discussionEntryDtoList.push(this.discussionEntry);
 
         const result = await RemoteServices.createClarification(
-          this.editClarification
+          this.clarification
         );
 
         this.$emit('save-clarification', result);
