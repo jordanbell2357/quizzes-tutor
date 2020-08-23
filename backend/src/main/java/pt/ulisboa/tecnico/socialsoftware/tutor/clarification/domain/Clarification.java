@@ -10,9 +10,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.domain.QuizQuestion;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
 
 import javax.persistence.*;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 @Table(name = "clarifications")
@@ -22,7 +20,7 @@ public class Clarification implements DomainEntity {
     private Integer id;
 
     @OneToMany(mappedBy = "clarification", fetch=FetchType.LAZY, orphanRemoval=true)
-    private Set<DiscussionEntry> discussionEntries = new HashSet<>();
+    private List<DiscussionEntry> discussionEntries = new ArrayList<>();
 
     @Column(name = "title")
     private String title;
@@ -64,11 +62,11 @@ public class Clarification implements DomainEntity {
         this.title = title;
     }
 
-    public Set<DiscussionEntry> getDiscussionEntries() {
+    public List<DiscussionEntry> getDiscussionEntries() {
         return discussionEntries;
     }
 
-    public void setDiscussionEntries(Set<DiscussionEntry> discussionEntries) {
+    public void setDiscussionEntries(List<DiscussionEntry> discussionEntries) {
         this.discussionEntries = discussionEntries;
     }
 

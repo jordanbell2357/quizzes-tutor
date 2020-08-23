@@ -37,7 +37,6 @@ public class DiscussionEntry implements DomainEntity {
         this.clarification = clarification;
         this.user = user;
         this.localDateTime = DateHandler.now();
-        this.id = discussionEntryDto.getId();
         if (discussionEntryDto.getMessage() != null) {
             if (!discussionEntryDto.getMessage().isEmpty()) {
                 this.message = discussionEntryDto.getMessage();
