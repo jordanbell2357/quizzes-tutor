@@ -16,6 +16,9 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.answer.dto.QuizAnswersDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.answer.repository.QuizAnswerRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.config.DateHandler;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.*;
+import pt.ulisboa.tecnico.socialsoftware.tutor.course.domain.CourseExecution;
+import pt.ulisboa.tecnico.socialsoftware.tutor.course.repository.CourseExecutionRepository;
+import pt.ulisboa.tecnico.socialsoftware.tutor.course.repository.CourseRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
 import pt.ulisboa.tecnico.socialsoftware.tutor.impexp.domain.CSVQuizExportVisitor;
@@ -357,9 +360,9 @@ public class QuizService {
         // remove questions that weren't in any quiz
         for (Question question: questionRepository.findQuestions(courseService.getDemoCourse().getCourseId())
                 .stream()
-                .filter(question -> question.getQuizQuestions().isEmpty())
+                .filter(question -> question.getQuizQuestions().isEmpty() && question.getStatus() != Question.Status.SUBMITTED)
                 .collect(Collectors.toList())) {
-            questionService.deleteQuestion(question);
+            questionService.removeQuestion(question.getId());
         }
     }
 

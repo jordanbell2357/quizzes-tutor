@@ -9,8 +9,8 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import pt.ulisboa.tecnico.socialsoftware.tutor.answer.domain.QuestionAnswer;
 import pt.ulisboa.tecnico.socialsoftware.tutor.answer.repository.QuestionAnswerRepository;
-import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course;
-import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseRepository;
+import pt.ulisboa.tecnico.socialsoftware.tutor.course.domain.Course;
+import pt.ulisboa.tecnico.socialsoftware.tutor.course.repository.CourseRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
 import pt.ulisboa.tecnico.socialsoftware.tutor.impexp.domain.LatexQuestionExportVisitor;
@@ -25,9 +25,11 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.ImageReposito
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.OptionRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.QuestionRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.TopicRepository;
+import pt.ulisboa.tecnico.socialsoftware.tutor.questionsubmission.QuestionSubmissionService;
+import pt.ulisboa.tecnico.socialsoftware.tutor.questionsubmission.repository.QuestionSubmissionRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.domain.QuizQuestion;
 import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.repository.QuizQuestionRepository;
-import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository;
+import pt.ulisboa.tecnico.socialsoftware.tutor.questionsubmission.domain.QuestionSubmission;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -65,10 +67,10 @@ public class QuestionService {
     private OptionRepository optionRepository;
 
     @Autowired
-    private QuestionAnswerRepository questionAnswerRepository;
+    private QuestionSubmissionService questionSubmissionService;
 
     @Autowired
-    private UserRepository userRepository;
+    private QuestionSubmissionRepository questionSubmissionRepository;
 
     @Retryable(
       value = { SQLException.class },
@@ -77,6 +79,14 @@ public class QuestionService {
     public QuestionDto findQuestionById(Integer questionId) {
         return questionRepository.findById(questionId).map(QuestionDto::new)
                 .orElseThrow(() -> new TutorException(QUESTION_NOT_FOUND, questionId));
+    }
+
+    @Retryable(
+          value = { SQLException.class },
+          backoff = @Backoff(delay = 5000))
+    @Transactional(isolation = Isolation.READ_COMMITTED)
+    public Integer findQuestionIdByQuestionSubmissionId(Integer questionSubmissionId) {
+        return questionSubmissionRepository.findQuestionIdByQuestionSubmissionId(questionSubmissionId).orElse(null);
     }
 
     @Retryable(
@@ -93,7 +103,7 @@ public class QuestionService {
       backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.READ_COMMITTED)
     public List<QuestionDto> findQuestions(int courseId) {
-        return questionRepository.findQuestions(courseId).stream().map(QuestionDto::new).collect(Collectors.toList());
+        return questionRepository.findQuestions(courseId).stream().filter(q -> !q.isInSubmission()).map(QuestionDto::new).collect(Collectors.toList());
     }
 
     @Retryable(
@@ -126,13 +136,18 @@ public class QuestionService {
         return new QuestionDto(question);
     }
 
-
     @Retryable(
       value = { SQLException.class },
       backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.READ_COMMITTED)
     public void removeQuestion(Integer questionId) {
         Question question = questionRepository.findById(questionId).orElseThrow(() -> new TutorException(QUESTION_NOT_FOUND, questionId));
+        QuestionSubmission questionSubmission = questionSubmissionRepository.findQuestionSubmissionByQuestionId(question.getId());
+
+        if (questionSubmission != null) {
+            throw new TutorException(CANNOT_DELETE_SUBMITTED_QUESTION);
+        }
+
         question.remove();
         questionRepository.delete(question);
     }
@@ -261,37 +276,7 @@ public class QuestionService {
         quizQuestionRepository.delete(quizQuestion);
 
         if (question.getQuizQuestions().isEmpty()) {
-            this.deleteQuestion(question);
+            this.removeQuestion(question.getId());
         }
-    }
-
-    @Retryable(
-            value = { SQLException.class },
-            backoff = @Backoff(delay = 5000))
-    @Transactional(isolation = Isolation.READ_COMMITTED)
-    public void deleteQuestion(Question question) {
-        for (Option option : question.getOptions()) {
-            option.remove();
-            optionRepository.delete(option);
-        }
-
-        if (question.getImage() != null) {
-            imageRepository.delete(question.getImage());
-        }
-
-        question.getTopics().forEach(topic -> topic.getQuestions().remove(question));
-        question.getTopics().clear();
-
-        questionRepository.delete(question);
-    }
-
-    @Retryable(
-            value = { SQLException.class },
-            backoff = @Backoff(delay = 5000))
-    @Transactional(isolation = Isolation.READ_COMMITTED)
-    public boolean userHasAnswered(int userId, Integer id) {
-        QuestionAnswer questionAnswer = questionAnswerRepository.findById(id).orElseThrow(() -> new TutorException(USER_NOT_FOUND, userId));
-        return questionAnswer.getQuizAnswer().getUser().getId() == userId;
     }
 }
-
