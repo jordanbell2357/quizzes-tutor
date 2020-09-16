@@ -16,7 +16,9 @@ export default class Clarification {
       this.id = jsonObj.id;
       this.questionAnswerId = jsonObj.questionAnswerId;
       this.title = jsonObj.title;
-      this.discussionEntryDtoList = jsonObj.discussionEntryDtoList;
+      this.discussionEntryDtoList = this.discussionLoader(
+        jsonObj.discussionEntryDtoList
+      );
       this.question = jsonObj.question;
       this.username = jsonObj.username;
       this.lastDiscussionEntry =
@@ -29,5 +31,15 @@ export default class Clarification {
         ].dateTime
       );
     }
+  }
+
+  discussionLoader(discussionEntryDtoList?: Array<DiscussionEntry>) {
+    let discussionEntry: DiscussionEntry[] = [];
+    if (discussionEntryDtoList) {
+      for (let i = 0; i < discussionEntryDtoList.length; i++) {
+        discussionEntry.push(new DiscussionEntry(discussionEntryDtoList[i]));
+      }
+    }
+    return discussionEntry;
   }
 }

@@ -21,16 +21,6 @@
         </v-card-title>
       </template>
 
-      <template v-slot:item.title="{ item }">
-        <div
-          @click="showClarificationDialog(item)"
-          @contextmenu="editClarificationDialog(item, $event)"
-          class="clickableTitle"
-        >
-          {{ item.title }}
-        </div>
-      </template>
-
       <template v-slot:item.action="{ item }">
         <v-tooltip bottom>
           <template v-slot:activator="{ on }">
@@ -40,9 +30,14 @@
           </template>
           <span>Add Answer</span>
         </v-tooltip>
+
         <v-tooltip bottom>
           <template v-slot:activator="{ on }">
-            <v-icon class="mr-2" v-on="on" @click="viewDiscussion(item)">
+            <v-icon
+              class="mr-2"
+              v-on="on"
+              @click="showClarificationDialog(item)"
+            >
               book
             </v-icon>
           </template>
@@ -51,11 +46,17 @@
       </template>
     </v-data-table>
     <add-discussion-entry-dialog
-      v-if="currentAddDiscussionEntry"
+      v-if="currentDiscussionEntry"
       v-model="addDiscussionEntryDialog"
       :clarificationId="currentClarificationId"
-      :discussionEntry="currentAddDiscussionEntry"
+      :discussionEntry="currentDiscussionEntry"
       v-on:close-add-discussion-dialog="onCloseAddDiscussionEntryDialog"
+    />
+    <show-clarification-dialog
+      v-if="currentClarification"
+      v-model="clarificationDialog"
+      :clarification="currentClarification"
+      v-on:close-clarification-dialog="onCloseClarificationDialog"
     />
   </v-card>
 </template>
@@ -69,11 +70,13 @@ import DiscussionEntry from '@/models/management/DiscussionEntry';
 import StatementClarification from '@/models/statement/StatementClarification';
 import Question from '@/models/management/Question';
 import AddDiscussionEntryDialog from '@/views/teacher/clarifications/AddDiscussionEntryDialog.vue';
+import ShowClarificationDialog from '@/views/teacher/clarifications/ShowClarificationDialog.vue';
 
 @Component({
   components: {
     'edit-clarification-dialog': EditClarificationDialog,
-    'add-discussion-entry-dialog': AddDiscussionEntryDialog
+    'add-discussion-entry-dialog': AddDiscussionEntryDialog,
+    'show-clarification-dialog': ShowClarificationDialog
   }
 })
 export default class ClarificationsView extends Vue {
@@ -81,22 +84,22 @@ export default class ClarificationsView extends Vue {
   search: string = '';
 
   headers: object = [
-    { text: 'Title', value: 'title', align: 'center', width: '10%' },
-    { text: 'Question', value: 'question', align: 'left' },
-    { text: 'User', value: 'username', align: 'left' },
-    { text: 'Last Entry', value: 'lastDiscussionEntry', align: 'left' },
-    { text: 'Time', value: 'timeOfLastEntry', align: 'left' },
     {
       text: 'Action',
       value: 'action',
       align: 'left',
       width: '5px',
       sortable: false
-    }
+    },
+    { text: 'Title', value: 'title', align: 'center', width: '10%' },
+    { text: 'Question', value: 'question', align: 'left' },
+    { text: 'User', value: 'username', align: 'left' },
+    { text: 'Last Entry', value: 'lastDiscussionEntry', align: 'left' },
+    { text: 'Time', value: 'timeOfLastEntry', align: 'left' }
   ];
 
-  currentShowDiscussionEntry: DiscussionEntry | null = null;
-  currentAddDiscussionEntry: DiscussionEntry | null = null;
+  currentDiscussionEntry: DiscussionEntry | null = null;
+  currentClarification: Clarification | null = null;
   addDiscussionEntryDialog: boolean = false;
   discussionEntryDialog: boolean = false;
   currentClarificationId: number | null = null;
@@ -113,9 +116,9 @@ export default class ClarificationsView extends Vue {
   }
 
   addDiscussion(clarification: Clarification) {
-    this.currentAddDiscussionEntry = new DiscussionEntry();
+    this.currentDiscussionEntry = new DiscussionEntry();
     this.currentClarificationId = clarification.id;
-    this.currentAddDiscussionEntry.clarificationId = clarification.id;
+    this.currentDiscussionEntry.clarificationId = clarification.id;
     this.addDiscussionEntryDialog = true;
   }
 
@@ -128,7 +131,7 @@ export default class ClarificationsView extends Vue {
   }
 
   showClarificationDialog(clarification: Clarification) {
-    this.currentClarificationId = clarification.id;
+    this.currentClarification = clarification;
     this.clarificationDialog = true;
   }
 
@@ -138,9 +141,9 @@ export default class ClarificationsView extends Vue {
     this.editClarification = true;
   }
 
-  async onCloseDiscussionEntryDialog() {
-    this.currentShowDiscussionEntry = null;
-    this.discussionEntryDialog = false;
+  async onCloseClarificationDialog() {
+    this.currentClarification = null;
+    this.clarificationDialog = false;
   }
 
   async onCloseAddDiscussionEntryDialog(discussionEntry: DiscussionEntry) {
@@ -148,13 +151,14 @@ export default class ClarificationsView extends Vue {
       if (this.clarifications[i].id == this.currentClarificationId) {
         let clarification = new Clarification();
         clarification = this.clarifications[i];
+        clarification.discussionEntryDtoList.push(discussionEntry);
         clarification.lastDiscussionEntry = discussionEntry.message;
         clarification.timeOfLastEntry = discussionEntry.dateTime;
         this.clarifications.splice(i, 1, clarification);
         break;
       }
     }
-    this.currentAddDiscussionEntry = null;
+    this.currentDiscussionEntry = null;
     this.currentClarificationId = null;
     this.addDiscussionEntryDialog = false;
   }

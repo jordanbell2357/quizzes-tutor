@@ -6,7 +6,7 @@ export default class DiscussionEntry {
   message: string = '';
   userId: number | null = null;
   dateTime: string = '';
-  username: string = '';
+  userName: string = '';
 
   constructor(jsonObj?: DiscussionEntry) {
     if (jsonObj) {
@@ -15,7 +15,7 @@ export default class DiscussionEntry {
       this.message = jsonObj.message;
       this.userId = jsonObj.userId;
       this.dateTime = ISOtoString(jsonObj.dateTime);
-      this.username = jsonObj.username;
+      this.userName = jsonObj.userName;
     }
   }
 }
