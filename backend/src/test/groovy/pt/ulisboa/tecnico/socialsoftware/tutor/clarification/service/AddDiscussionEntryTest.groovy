@@ -10,6 +10,8 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.domain.Clarificatio
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.domain.DiscussionEntry
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.dto.DiscussionEntryDto
 import pt.ulisboa.tecnico.socialsoftware.tutor.config.DateHandler
+import pt.ulisboa.tecnico.socialsoftware.tutor.course.domain.Course
+import pt.ulisboa.tecnico.socialsoftware.tutor.course.domain.CourseExecution
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Question
 import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.domain.Quiz
@@ -25,9 +27,16 @@ class AddDiscussionEntryTest extends SpockTest {
     def quiz
     def quizAnswer
     def quizQuestion
+    def course
+    def courseExecution
 
     def setup() {
-        user = new User(USER_1_NAME, USER_1_USERNAME, User.Role.STUDENT)
+        course = new Course(COURSE_1_NAME, Course.Type.EXTERNAL)
+        courseRepository.save(course)
+        courseExecution = new CourseExecution(course, COURSE_1_ACRONYM, COURSE_1_ACADEMIC_TERM, Course.Type.EXTERNAL)
+        courseExecutionRepository.save(courseExecution)
+
+        user = new User(USER_1_NAME, USER_1_EMAIL, USER_1_EMAIL, User.Role.STUDENT, true, false)
         user.addCourse(courseExecution)
         userRepository.save(user)
         user.setKey(user.getId())
