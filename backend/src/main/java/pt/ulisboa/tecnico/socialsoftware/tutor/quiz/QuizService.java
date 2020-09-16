@@ -10,9 +10,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import pt.ulisboa.tecnico.socialsoftware.tutor.answer.AnswerService;
+import pt.ulisboa.tecnico.socialsoftware.tutor.answer.domain.QuestionAnswer;
 import pt.ulisboa.tecnico.socialsoftware.tutor.answer.domain.QuizAnswer;
 import pt.ulisboa.tecnico.socialsoftware.tutor.answer.dto.QuizAnswerDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.answer.dto.QuizAnswersDto;
+import pt.ulisboa.tecnico.socialsoftware.tutor.answer.repository.QuestionAnswerRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.answer.repository.QuizAnswerRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.config.DateHandler;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.*;
@@ -68,6 +70,9 @@ public class QuizService {
 
     @Autowired
     private QuestionAnswerItemRepository questionAnswerItemRepository;
+
+    @Autowired
+    private QuestionAnswerRepository questionAnswerRepository;
 
     @Autowired
     private QuizAnswerRepository quizAnswerRepository;
@@ -394,5 +399,14 @@ public class QuizService {
         }
 
         return new QuizDto(quiz, false);
+    }
+
+    @Retryable(
+            value = { SQLException.class },
+            backoff = @Backoff(delay = 5000))
+    @Transactional(isolation = Isolation.READ_COMMITTED)
+    public boolean userHasAnswered(int userId, int id){
+        QuestionAnswer questionAnswer = questionAnswerRepository.findById(id).orElseThrow(() -> new TutorException(QUESTION_ANSWER_NOT_FOUND, id));
+        return questionAnswer.getQuizAnswer().getUser().getId() == userId;
     }
 }

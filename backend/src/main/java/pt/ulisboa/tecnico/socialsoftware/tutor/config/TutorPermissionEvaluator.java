@@ -18,6 +18,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.QuestionRepos
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.TopicRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.questionsubmission.domain.QuestionSubmission;
 import pt.ulisboa.tecnico.socialsoftware.tutor.questionsubmission.repository.QuestionSubmissionRepository;
+import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.QuizService;
 import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.repository.QuizRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository;
@@ -50,6 +51,9 @@ public class TutorPermissionEvaluator implements PermissionEvaluator {
 
     @Autowired
     private CourseService courseService;
+
+    @Autowired
+    private QuizService quizService;
 
     @Autowired
     private UserService userService;
@@ -95,7 +99,7 @@ public class TutorPermissionEvaluator implements PermissionEvaluator {
                     }
                     return false;
                 case "QA.ACCESS":
-                    return questionService.userHasAnswered(userId, id);
+                    return quizService.userHasAnswered(userId, id);
                 case "CLARIFICATION.ACCESS":
                     return clarificationService.userHasCreated(id, userId);
                 case "TOPIC.ACCESS":

@@ -587,7 +587,6 @@ public class User implements UserDetails, DomainEntity {
     }
 
     public void addClarification(Clarification clarification) { this.clarifications.add(clarification);}
-}
 
     public void remove() {
         if (active) {
