@@ -10,6 +10,7 @@ export default class Clarification {
   username: string | null = null;
   lastDiscussionEntry: string | undefined = '';
   timeOfLastEntry: string | undefined = '';
+  timeOfCreation: string | undefined = '';
 
   constructor(jsonObj?: Clarification) {
     if (jsonObj) {
@@ -29,6 +30,9 @@ export default class Clarification {
         jsonObj.discussionEntryDtoList[
           jsonObj.discussionEntryDtoList.length - 1
         ].dateTime
+      );
+      this.timeOfCreation = ISOtoString(
+        jsonObj.discussionEntryDtoList[0].dateTime
       );
     }
   }

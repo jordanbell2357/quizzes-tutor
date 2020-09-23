@@ -95,7 +95,8 @@ export default class ClarificationsView extends Vue {
     { text: 'Question', value: 'question', align: 'left' },
     { text: 'User', value: 'username', align: 'left' },
     { text: 'Last Entry', value: 'lastDiscussionEntry', align: 'left' },
-    { text: 'Time', value: 'timeOfLastEntry', align: 'left' }
+    { text: 'Time of Last Entry', value: 'timeOfLastEntry', align: 'left' },
+    { text: 'Creation Date', value: 'timeOfCreation', align: 'left' }
   ];
 
   currentDiscussionEntry: DiscussionEntry | null = null;
@@ -120,14 +121,6 @@ export default class ClarificationsView extends Vue {
     this.currentClarificationId = clarification.id;
     this.currentDiscussionEntry.clarificationId = clarification.id;
     this.addDiscussionEntryDialog = true;
-  }
-
-  async viewDiscussion(clarification: Clarification) {
-    let statementManager: StatementClarification =
-      StatementClarification.getInstance;
-    statementManager.clarification = clarification;
-    statementManager.discussionEntries = clarification.discussionEntryDtoList;
-    await this.$router.push({ name: 'clarification-discussion-view' });
   }
 
   showClarificationDialog(clarification: Clarification) {
