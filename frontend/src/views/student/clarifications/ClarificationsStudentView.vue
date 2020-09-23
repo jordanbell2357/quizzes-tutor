@@ -79,7 +79,7 @@ import ShowClarificationDialog from '@/views/teacher/clarifications/ShowClarific
     'show-clarification-dialog': ShowClarificationDialog
   }
 })
-export default class ClarificationsView extends Vue {
+export default class ClarificationsStudentView extends Vue {
   clarifications: Clarification[] = [];
   search: string = '';
 
@@ -108,7 +108,7 @@ export default class ClarificationsView extends Vue {
 
   async created() {
     try {
-      this.clarifications = await RemoteServices.getAllClarifications();
+      this.clarifications = await RemoteServices.getPersonalClarifications();
     } catch (e) {
       await this.$store.dispatch('error', e);
     }

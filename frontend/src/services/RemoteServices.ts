@@ -240,6 +240,21 @@ export default class RemoteServices {
       });
   }
 
+  static async getPersonalClarifications(): Promise<Clarification[]> {
+    return httpClient
+      .get(
+        `/clarification/get`
+      )
+      .then(response => {
+        return response.data.map((clarification: any) => {
+          return new Clarification(clarification);
+        });
+      })
+      .catch(async error => {
+        throw Error(await this.errorMessage(error));
+      });
+  }
+
   static async getClarificationById(
     clarificationId: number | null
   ): Promise<Clarification> {

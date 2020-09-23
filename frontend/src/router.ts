@@ -31,6 +31,7 @@ import ClarificationsView from '@/views/teacher/clarifications/ClarificationsVie
 
 import QuestionSubmissionView from '@/views/questionsubmission/QuestionSubmissionView.vue';
 import SortQuestionSubmissionsByStudentView from '@/views/questionsubmission/SortQuestionSubmissionsByStudentView.vue';
+import ClarificationsStudentView from '@/views/student/clarifications/ClarificationsStudentView.vue';
 
 Vue.use(Router);
 
@@ -253,6 +254,15 @@ let router = new Router({
           component: QuestionSubmissionView,
           meta: {
             title: APP_NAME + ' - Submissions',
+            requiredAuth: 'Student'
+          }
+        },
+        {
+          path: 'clarifications',
+          name: 'clarifications-student',
+          component: ClarificationsStudentView,
+          meta: {
+            title: APP_NAME + ' - Clarifications',
             requiredAuth: 'Student'
           }
         }

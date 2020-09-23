@@ -166,6 +166,15 @@
                 <v-list-item-title>Solved</v-list-item-title>
               </v-list-item-content>
             </v-list-item>
+            <v-list-item to="/student/clarifications">
+              <v-list-item-action>
+                <v-icon>comment</v-icon>
+              </v-list-item-action>
+              <v-list-item-content>
+                <v-list-item-title>Clarifications</v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
+
           </v-list>
         </v-menu>
 
@@ -382,6 +391,7 @@
             </v-list-item-action>
             <v-list-item-content>Submissions</v-list-item-content>
           </v-list-item>
+
 
           <v-list-item to="/student/stats">
             <v-list-item-action>
