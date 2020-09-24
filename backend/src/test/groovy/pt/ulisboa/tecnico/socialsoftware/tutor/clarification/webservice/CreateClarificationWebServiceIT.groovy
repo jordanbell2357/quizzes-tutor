@@ -32,8 +32,8 @@ class CreateClarificationWebServiceIT extends SpockTest{
     def setup() {
         restClient = new RESTClient("http://localhost:" + port)
 
-        courseExecution = courseExecutionRepository.findB().get(0)
-        course = courseRepository.findByNameType('Demo ').get()
+        courseExecution = courseExecutionRepository.findAll().get(0)
+        course = courseRepository.findAll().get(0)
         def user = userRepository.findByUsername('Demo-Student').get()
 
         quiz = new Quiz()
@@ -61,7 +61,7 @@ class CreateClarificationWebServiceIT extends SpockTest{
         questionAnswer.setQuizAnswer(quizAnswer)
         questionAnswerRepository.save(questionAnswer)
 
-        createdUserLogin(USER_1_EMAIL, USER_1_PASSWORD)
+        demoStudentLogin()
     }
 
     def "creating a clarification"(){
