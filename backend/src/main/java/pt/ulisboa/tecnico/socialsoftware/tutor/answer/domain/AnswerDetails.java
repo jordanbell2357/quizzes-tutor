@@ -15,11 +15,10 @@ import javax.persistence.*;
         discriminatorType = DiscriminatorType.STRING)
 public abstract class AnswerDetails implements DomainEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @OneToOne(fetch = FetchType.EAGER, optional = false, cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "question_answer_id")
+    @MapsId
     private QuestionAnswer questionAnswer;
 
     public AnswerDetails() {

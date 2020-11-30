@@ -18,10 +18,10 @@ import javax.persistence.*;
         discriminatorType = DiscriminatorType.STRING)
 public abstract class QuestionDetails implements DomainEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+    @MapsId
     private Question question;
 
     public QuestionDetails(Question question) {
